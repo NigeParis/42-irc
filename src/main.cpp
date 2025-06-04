@@ -6,15 +6,17 @@
 /*   By: nige42 <nige42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:53:53 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/04 22:01:30 by nige42           ###   ########.fr       */
+/*   Updated: 2025/06/04 22:23:53 by nige42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/ircserv.hpp"
+#include "../include/server.hpp"
 
 int main(void) {
 
-    std::cout << "H+elloworld" << std::endl;
+
+    Server server(3333, "password");
+    std::cout << "Helloworld" << std::endl;
 
     
     return 0;

@@ -16,7 +16,7 @@ CXX=c++
 
 
 SRC_DIR = src/
-SRC = main.cpp ircserv.cpp
+SRC = main.cpp server.cpp
 
 OBJ_DIR = build/
 
