@@ -6,7 +6,7 @@
 /*   By: nige42 <nige42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:53:53 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/05 10:34:48 by nige42           ###   ########.fr       */
+/*   Updated: 2025/06/05 11:08:29 by nige42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,18 @@
 
 int main(int argc, char *argv[]) {
 
+    Server *server = 0;
+
     if (argc != 3) {
         std::cout << "Error" << std::endl;
         return(1);
     }
     
-    Server server(atoi(argv[1]), argv[2]);
+    server = new Server(atoi(argv[1]), argv[2]);
     
-    server.createServer(); 
+    server->createServer(); 
+
+
+    delete server;
     return 0;
 }
