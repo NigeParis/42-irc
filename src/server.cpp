@@ -6,7 +6,7 @@
 /*   By: nige42 <nige42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/05 14:48:19 by nige42           ###   ########.fr       */
+/*   Updated: 2025/06/05 16:29:53 by nige42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,14 +53,17 @@ void Server::createServer(void) {
     std::cout << "server listening on: " << this->port_ << std::endl;
 
     int client_fd = accept(socket_, (struct sockaddr *)&client_addr, &client_addr_len);
+    //fcntl(client_fd, F_SETFL, O_NONBLOCK);
     std::cout << "Client connected" << std::endl;
 
 
     ssize_t bytes_read = read(client_fd, buffer, sizeof(buffer) - 1);
-    buffer[bytes_read] = '\0'; // Null-terminate the buffer
+    buffer[bytes_read] = '\0';
     std::cout << "Received message: " << buffer << std::endl;
     
-  
+    const char *message = "Hello, Client!";
+    send(client_fd, message, strlen(message), 0);
+
     
 };
 

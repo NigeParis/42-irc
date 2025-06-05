@@ -6,10 +6,11 @@
 /*   By: nige42 <nige42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:08 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/05 10:27:06 by nige42           ###   ########.fr       */
+/*   Updated: 2025/06/05 16:22:19 by nige42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#pragma once
 #include <iostream>
 #include <vector>
 #include <sys/types.h>
@@ -20,6 +21,9 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
+#include <fcntl.h>
+
+class User;
 
 class Server {
 
@@ -28,6 +32,8 @@ class Server {
         Server(int port, std::string password);
         ~Server();
         void createServer(void);
+        
+        std::vector<User*> users;
 
     private:
     
