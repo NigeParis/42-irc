@@ -6,7 +6,7 @@
 /*   By: nige42 <nige42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/05 16:29:53 by nige42           ###   ########.fr       */
+/*   Updated: 2025/06/05 16:34:09 by nige42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,8 +61,8 @@ void Server::createServer(void) {
     buffer[bytes_read] = '\0';
     std::cout << "Received message: " << buffer << std::endl;
     
-    const char *message = "Hello, Client!";
-    send(client_fd, message, strlen(message), 0);
+    std::string message = "Hello, Client!";
+    send(client_fd, message.c_str(), message.size(), 0);
 
     
 };
