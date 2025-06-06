@@ -6,7 +6,7 @@
 /*   By: nige42 <nige42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/06 16:06:06 by nige42           ###   ########.fr       */
+/*   Updated: 2025/06/06 16:46:32 by nige42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,9 +51,7 @@ void Server::createServer(void) {
 
     
     
-    std::string message = "Hello, Client!";
-    if (!users_.empty())
-        send(users_[0], message.c_str(), message.size(), 0);
+  
 
 };
 
@@ -77,11 +75,20 @@ void Server::makeUser(void) {
 
 void Server::readMessage(int client_fd) {
 
-    std::string buffer(1014, '\0');
+    std::string buffer(BUFFER, '\0');
 
-    ssize_t bytes_read = read(client_fd, &buffer[0], sizeof(buffer) - 1);
-    buffer[bytes_read] = '\0';
-    if (bytes_read > 0)
+    ssize_t bytes_read = read(client_fd, &buffer[client_fd], sizeof(buffer) - 1);
+    if (bytes_read > 0) {
         std::cout << "Received message: " << buffer;
+    }
+};
+
+
+
+void Server::sendMessage(int client_fd, std::string message) {
+
+    if (client_fd > -1 && !message.empty())
+        send(client_fd, message.c_str(), message.size(), 0);
+
     
 }
