@@ -6,7 +6,7 @@
 /*   By: nige42 <nige42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:08 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/05 16:22:19 by nige42           ###   ########.fr       */
+/*   Updated: 2025/06/06 15:28:52 by nige42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,10 @@ class Server {
         Server(int port, std::string password);
         ~Server();
         void createServer(void);
-        
-        std::vector<User*> users;
+        void makeUser(void);        
+        void readMessage(int client_fd);
+                    
+        std::vector<int> users_;
 
     private:
     
