@@ -6,7 +6,7 @@
 /*   By: nige42 <nige42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/08 17:45:17 by nige42           ###   ########.fr       */
+/*   Updated: 2025/06/08 17:58:35 by nige42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,10 +87,10 @@ void Server::readMessage(User &user) {
 
 
 
-void Server::sendMessage(int client_fd, std::string message) {
+void Server::sendMessage(User &user, std::string message) {
 
-    if (client_fd > -1 && !message.empty())
-        send(client_fd, message.c_str(), message.size(), 0);
+    if (user.getUserFd() > -1 && !message.empty())
+        send(user.getUserFd(), message.c_str(), message.size(), 0);
 
     
 }
