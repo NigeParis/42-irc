@@ -6,7 +6,7 @@
 /*   By: nige42 <nige42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:53:53 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/08 17:59:46 by nige42           ###   ########.fr       */
+/*   Updated: 2025/06/08 22:08:26 by nige42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,16 +30,11 @@ int main(int argc, char *argv[]) {
     server->makeUser();
     
 
-    sleep(10);    
-    while (1) {
-        sleep(5);
-        std::cout << "reading message" << std::endl;
-        server->readMessage(*server->users_[0]);
-        server->readMessage(*server->users_[1]);
-        server->sendMessage(*server->users_[0], "Coucou zero server here \n");
-        server->sendMessage(*server->users_[1], "Coucou Un server here \n");
-    }
-
+    sleep(10);   
+    
+    
+    server->userLoopCheck();
+   
     
     delete server;
     return 0;

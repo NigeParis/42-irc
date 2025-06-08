@@ -6,7 +6,7 @@
 /*   By: nige42 <nige42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:08 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/08 17:59:05 by nige42           ###   ########.fr       */
+/*   Updated: 2025/06/08 22:03:55 by nige42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ class Server {
         void makeUser(void);        
         void readMessage(User& user);
         void sendMessage(User &user, std::string message);
+        void userLoopCheck(void);
 
                     
         std::vector<User*> users_;

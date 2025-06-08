@@ -6,7 +6,7 @@
 /*   By: nige42 <nige42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/08 17:58:35 by nige42           ###   ########.fr       */
+/*   Updated: 2025/06/08 22:10:57 by nige42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,3 +94,29 @@ void Server::sendMessage(User &user, std::string message) {
 
     
 }
+
+
+
+
+void Server::userLoopCheck(void) {
+
+    while (1) {
+
+        sleep(5); // need a waiting function
+
+
+
+        
+        std::cout << "reading message" << std::endl;
+        for (size_t i = 0; i < this->users_.size(); i++) {
+            readMessage(*this->users_[i]);
+        }
+
+
+        // to test the send function to terminals
+        sendMessage(*this->users_[0], "Coucou zero server here \n");
+        sendMessage(*this->users_[1], "Coucou Un server here \n");
+        
+    }
+    
+};
