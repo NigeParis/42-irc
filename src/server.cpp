@@ -6,7 +6,7 @@
 /*   By: nige42 <nige42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/06 16:46:32 by nige42           ###   ########.fr       */
+/*   Updated: 2025/06/08 17:45:17 by nige42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,21 +66,23 @@ void Server::makeUser(void) {
     int client_fd = accept(socket_, (struct sockaddr *)&client_addr, &client_addr_len);
     fcntl(client_fd, F_SETFL, O_NONBLOCK);
     std::cout << "Client connected" << std::endl;
-
-    users_.push_back(client_fd);
+    User* user = new User(client_fd, POLLIN, 0);
+  
+    users_.push_back(user);
     
 }
 
 
 
-void Server::readMessage(int client_fd) {
+void Server::readMessage(User &user) {
 
     std::string buffer(BUFFER, '\0');
-
-    ssize_t bytes_read = read(client_fd, &buffer[client_fd], sizeof(buffer) - 1);
-    if (bytes_read > 0) {
+    std::cout << "user->fd: " << user.getUserFd() << std::endl;
+    ssize_t bytes_read = recv(user.getUserFd(), &buffer[0], buffer.size() - 1, 0);
+    if (bytes_read != -1) {
         std::cout << "Received message: " << buffer;
     }
+    std::cout << "bytes read: " << bytes_read << std::endl;
 };
 
 

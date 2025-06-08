@@ -6,7 +6,7 @@
 /*   By: nige42 <nige42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:08 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/06 16:20:06 by nige42           ###   ########.fr       */
+/*   Updated: 2025/06/08 17:39:09 by nige42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@
 #include <netinet/in.h>
 #include <fcntl.h>
 
+#include "user.hpp"
+
 #define BUFFER 1024
 
 class User;
@@ -35,11 +37,11 @@ class Server {
         ~Server();
         void createServer(void);
         void makeUser(void);        
-        void readMessage(int client_fd);
+        void readMessage(User& user);
         void sendMessage(int client_fd, std::string message);
 
                     
-        std::vector<int> users_;
+        std::vector<User*> users_;
 
     private:
     
