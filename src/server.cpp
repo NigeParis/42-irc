@@ -6,11 +6,16 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/10 10:00:14 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/10 10:37:01 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/server.hpp"
+
+// helper functions
+std::string connectMessage(User *user);
+
+
 
 
 Server::Server(int port, std::string password) : port_(port), password_(password){
@@ -56,8 +61,8 @@ void Server::createServer(void) {
 };
 
 
-void Server::makeUser(void) {
 
+void Server::makeUser(void) {
 
     struct sockaddr_in client_addr;
     socklen_t client_addr_len = sizeof(client_addr);
@@ -65,10 +70,17 @@ void Server::makeUser(void) {
     
     int client_fd = accept(socket_, (struct sockaddr *)&client_addr, &client_addr_len);
     fcntl(client_fd, F_SETFL, O_NONBLOCK);
-    std::cout << "Client connected" << std::endl;
     User* user = new User(client_fd, POLLIN, 0);
-  
+    
     users_.push_back(user);
+
+
+    
+    
+    
+    
+    sendMessage(*user, connectMessage(user));
+
     
 }
 
@@ -105,7 +117,7 @@ void Server::userLoopCheck(void) {
 
     while (1) {
         
-            for (size_t i = 0; i < users_.size(); i++) {
+        for (size_t i = 0; i < users_.size(); i++) {
         
             int trigger = poll(&users_[i]->user_pollfd, users_.size(), 3000);
 
@@ -118,11 +130,26 @@ void Server::userLoopCheck(void) {
                     }
                 }
            }
-    }
-        // to test the send function to terminals
-        //sendMessage(*this->users_[0], "Coucou zero server here \n");
-        //sendMessage(*this->users_[1], "Coucou Un server here \n");
-        
+        }
+
     }
     
 };
+
+
+
+
+
+
+
+// Helper functions
+
+
+std::string connectMessage(User *user) {
+    std::stringstream ss;
+    std::string message = "Welcome User: ";
+    ss << user->getUserFd();
+    message += ss.str();
+    
+    return (message);
+}
