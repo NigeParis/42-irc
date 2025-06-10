@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:08 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/10 10:26:42 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/10 18:58:40 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,12 +22,17 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <fcntl.h>
+#include <signal.h>
 
+#include <sys/epoll.h>
+#include <cstdio>
 #include <sstream>
 
 #include "user.hpp"
+#include "SigHandler.hpp"
 
 #define BUFFER 1024
+#define EVENTSBUFFER 1024
 
 class User;
 
@@ -42,15 +47,16 @@ class Server {
         void readMessage(User& user);
         void sendMessage(User &user, std::string message);
         void userLoopCheck(void);
-
+        User* findUserByFd(int fd);
                     
         std::vector<User*> users_;
-
-    private:
-    
+        
+        private:
+        
         int port_;
         int socket_;
         std::string password_;
+        
 
     
 };
