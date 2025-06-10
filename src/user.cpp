@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   user.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nige42 <nige42@student.42.fr>              +#+  +:+       +#+        */
+/*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/06 11:07:49 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/08 17:33:15 by nige42           ###   ########.fr       */
+/*   Updated: 2025/06/10 09:34:27 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,10 @@ User::User(int fd, short events, short revents) {
 (void) revents;
 this->socketFd_ = fd;
 
-//     this->user_pollfd.fd = fd;
-//     this->user_pollfd.events = events;
-//     this->user_pollfd.revents = revents;
-//      ?????
+this->user_pollfd.fd = fd;
+this->user_pollfd.events = events;
+this->user_pollfd.revents = revents;
+
 
 }
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nige42 <nige42@student.42.fr>              +#+  +:+       +#+        */
+/*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:53:53 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/08 22:08:26 by nige42           ###   ########.fr       */
+/*   Updated: 2025/06/10 09:51:42 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,14 +25,14 @@ int main(int argc, char *argv[]) {
     
     server->createServer(); 
 
+    std::cout << "makeUser()" << std::endl;
 
     server->makeUser();
     server->makeUser();
     
 
-    sleep(10);   
     
-    
+    std::cout << "userLoopStart called" << std::endl;
     server->userLoopCheck();
    
     
