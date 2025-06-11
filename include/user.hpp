@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/05 15:01:27 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/10 18:24:56 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/11 11:15:07 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #include <string>
 #include <poll.h>
 #include <vector> 
+#include <sstream>
 
 class User {
 
@@ -25,11 +26,17 @@ class User {
         void setUserFd(int fd);
         int getUserFd(void);
 
+
+        void setNickName(std::string &name);
+        std::string getNickName(void);
+
         struct pollfd user_pollfd;
         
     private:
 
         int socketFd_;
+        std::string nickName_;
+        std::string userName_;
         
     
     

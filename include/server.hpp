@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:08 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/10 18:58:40 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/11 13:52:16 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,12 +27,22 @@
 #include <sys/epoll.h>
 #include <cstdio>
 #include <sstream>
+#include <algorithm>
 
 #include "user.hpp"
 #include "SigHandler.hpp"
 
+#define RED "\033[31m"
+#define BLUE "\033[34m"
+#define GREEN "\033[32m"
+#define GREY "\033[30m"
+#define YELLOW "\033[33m"
+#define LIGHTBLUE "\033[36m"
+#define PINK "\033[35m"
+#define RESET "\033[0m"
+
+
 #define BUFFER 1024
-#define EVENTSBUFFER 1024
 
 class User;
 
@@ -48,6 +58,10 @@ class Server {
         void sendMessage(User &user, std::string message);
         void userLoopCheck(void);
         User* findUserByFd(int fd);
+        void getClientMessage (int client_fd);
+        void putServerBanner(void);
+        std::string connectMessage(User *user);
+
                     
         std::vector<User*> users_;
         

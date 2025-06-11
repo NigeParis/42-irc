@@ -6,23 +6,17 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/10 19:50:26 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/11 14:03:02 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/server.hpp"
 
 // helper functions
-std::string connectMessage(User *user);
-
-
 
 
 Server::Server(int port, std::string password) : port_(port), password_(password){
-
-    std::cout << "constructor" << " port: "<< port 
-    << " PW: " << password << std::endl;
-    
+    //std::cout << "constructor" << " port: "<< port << " PW: " << password << std::endl;
 };
 
 Server::~Server() {
@@ -56,19 +50,14 @@ void Server::createServer(void) {
     bind(this->socket_, (struct sockaddr*)&addressServer, sizeof(addressServer));
     listen(this->socket_, 10); 
 
-    std::cout << "server listening on: " << this->port_ << std::endl;
-
-
-    
-    
-  
-
+    putServerBanner();
 };
 
 
 
 void Server::makeUser(void) {
 
+    std::string name = "guest"; // default name
     struct sockaddr_in client_addr;
     socklen_t client_addr_len = sizeof(client_addr);
 
@@ -79,10 +68,7 @@ void Server::makeUser(void) {
     
     users_.push_back(user);
 
-    // delete user;
-    
-    
-    
+    user->setNickName(name);
     
     sendMessage(*user, connectMessage(user));
 
@@ -94,12 +80,19 @@ void Server::makeUser(void) {
 void Server::readMessage(User &user) {
 
     std::string buffer(BUFFER, '\0');
-   // std::cout << "user->fd: " << user.getUserFd() << std::endl;
     ssize_t bytes_read = recv(user.getUserFd(), &buffer[0], buffer.size() - 1, 0);
-    if (bytes_read != -1) {
-        std::cout << "Received message: " << buffer;
+    if (bytes_read == 0) {
+        close(user.getUserFd());
+        std::vector<User*>::iterator it = std::find(users_.begin(), users_.end(), &user);  
+        if (it != users_.end()) {
+            users_.erase(it);
+            return ;
+        }            
     }
-    // std::cout << "bytes read: " << bytes_read << std::endl;
+    if (bytes_read != -1 && buffer[0] != '\r') {
+        std::cout << RED << "Received message: "  << RESET;
+        std::cout << buffer;
+    }
 };
 
 
@@ -113,7 +106,13 @@ void Server::sendMessage(User &user, std::string message) {
 }
 
 
+void Server::getClientMessage (int client_fd){
 
+    User* user = findUserByFd(client_fd);
+    if (user != NULL) {
+        readMessage(*user);       
+    } 
+};
 
 
 
@@ -162,16 +161,13 @@ void Server::userLoopCheck() {
                 std::cout << "Users connected: " << users_.size() << std::endl;
 
             }
-            else if (events[i].events & EPOLLIN) {
-                User* user = findUserByFd(fd);
-                if (user != NULL) {
-                    std::cout << "Reading message from user" << std::endl;
-                    readMessage(*user);              
-                }
+            else if (events[i].events & EPOLLIN) {  
+                if ((events[i].events & (EPOLLERR | EPOLLHUP)) == 0)           
+                    getClientMessage(fd);
             }
+
         }
     }
-    //delete user
 
     close(epfd);
 }
@@ -184,11 +180,12 @@ void Server::userLoopCheck() {
 // Helper functions
 
 
-std::string connectMessage(User *user) {
+std::string Server::connectMessage(User *user) {
     std::stringstream ss;
-    std::string message = "Welcome User: ";
+    std::string message = "Welcome ";
     ss << user->getUserFd();
-    message += ss.str();
+    message += user->getNickName();
+    //message += "#" + ss.str();
     message += "\n";
     return (message);
 }
@@ -202,3 +199,16 @@ User* Server::findUserByFd(int fd) {
     }
     return NULL;
 }
+
+
+void Server::putServerBanner(void) {
+
+    std::cout << "███████╗███████╗██████╗██╗   ██╗███████╗██████╗     ██╗██████╗  ██████╗ " << std::endl;
+    std::cout << "█╔════╝██╔════╝██╔══██╗██║   ██║██╔════╝██╔══██╗    ██║██╔══██╗██╔════╝ "<< std::endl;
+    std::cout << "██████╗█████╗  ██████╔╝██║   ██║█████╗  ██████╔╝    ██║██████╔╝██║" << std::endl;
+    std::cout << "════██║██╔══╝  ██╔══██╗╚██╗ ██╔╝██╔══╝  ██╔══██╗    ██║██╔══██╗██║" << std::endl;   
+    std::cout << "██████║███████╗██║  ██║ ╚████╔╝ ███████╗██║  ██║    ██║██║  ██║╚██████╗ " << std::endl;
+    std::cout << "══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝    ╚═╝╚═╝  ╚═╝ ╚═════╝ " << std::endl << std::endl;
+    std::cout << "═══════════════════════════════════════════════════════════════════════ " << std::endl;
+    std::cout << "server listening on port: " << this->port_ << std::endl;
+};
