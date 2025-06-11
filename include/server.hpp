@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:08 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/11 16:10:37 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/11 17:01:57 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,8 @@ class Server {
     public:
     
         Server(int port, std::string password);
-        ~Server();
+        ~Server();        size_t getUsersSize(void);
+
         void createServer(void);
         void makeUser(void);        
         void readMessage(User& user);
@@ -64,6 +65,7 @@ class Server {
         void addNewClient(epoll_event &user_ev, int epfd);
 
         std::string  putClientBanner(void);
+
 
                     
         std::vector<User*> users_;

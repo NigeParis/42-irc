@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/05 15:01:27 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/11 11:15:07 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/11 16:33:35 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include <poll.h>
 #include <vector> 
 #include <sstream>
+#include "../include/server.hpp"
 
 class User {
 
@@ -22,7 +23,6 @@ class User {
 
         User (int fd, short events, short revents);
         ~User(void);
-
         void setUserFd(int fd);
         int getUserFd(void);
 

@@ -6,14 +6,11 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/11 16:11:36 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/11 17:02:42 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/server.hpp"
-
-// helper functions
-
 
 Server::Server(int port, std::string password) : port_(port), password_(password){
     //std::cout << "constructor" << " port: "<< port << " PW: " << password << std::endl;
@@ -30,6 +27,7 @@ Server::~Server() {
 
     
 };
+
 
 
 void Server::createServer(void) {
@@ -54,7 +52,6 @@ void Server::createServer(void) {
 };
 
 
-
 void Server::makeUser(void) {
 
     std::string name = "guest"; // default name
@@ -76,7 +73,6 @@ void Server::makeUser(void) {
 }
 
 
-
 void Server::readMessage(User &user) {
 
     std::string buffer(BUFFER, '\0');
@@ -84,12 +80,13 @@ void Server::readMessage(User &user) {
     int fd = user.getUserFd();
     ssize_t bytes_read = recv(user.getUserFd(), &buffer[0], buffer.size() - 1, 0);
     if (bytes_read == 0) {
-        std::vector<User*>::iterator it = std::find(users_.begin(), users_.end(), &user);  
-        delete &user;
-        if (it != users_.end()) {
-            users_.erase(it);
-        close(fd);
-        return ;
+            std::vector<User*>::iterator it = std::find(users_.begin(), users_.end(), &user);  
+            delete &user;
+            if (it != users_.end()) {
+                users_.erase(it);
+            close(fd);
+            std::cout << "Users connected: " << users_.size() << std::endl;
+            return ;
         }            
     }
     if (checkfd != user.getUserFd() && buffer[0] != '\r') {
@@ -123,16 +120,13 @@ void Server::getClientMessage (int client_fd){
 
 void Server::addNewClient(epoll_event &user_ev, int epfd) {
 
-        std::cout << "New client detected! Calling makeUser()" << std::endl;
+        //std::cout << "New client detected! Calling makeUser()" << std::endl;
         makeUser();
-
         user_ev.events = EPOLLIN;
         user_ev.data.fd = users_.back()->user_pollfd.fd;
         epoll_ctl(epfd, EPOLL_CTL_ADD, users_.back()->user_pollfd.fd, &user_ev);
         std::cout << "Users connected: " << users_.size() << std::endl;
 };
-
-
 
 
 void Server::userLoopCheck() {
@@ -160,7 +154,6 @@ void Server::userLoopCheck() {
         }
         for (int i = 0; i < num_events; ++i) {
             int fd = events[i].data.fd;
-
             if (fd == this->socket_ && (events[i].events & EPOLLIN)) {
                 addNewClient(user_ev, epfd);
             } 
@@ -169,7 +162,7 @@ void Server::userLoopCheck() {
                     getClientMessage(fd);
                 }
             }
-        }
+        }        
     }
     close(epfd);
 }
@@ -181,7 +174,6 @@ void Server::userLoopCheck() {
 
 
 // Helper functions
-
 
 std::string Server::connectMessage(User *user) {
     std::stringstream ss; 
@@ -214,6 +206,8 @@ void Server::putServerBanner(void) {
     std::cout << " ══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝    ╚═╝╚═╝  ╚═╝ ╚═════╝ " << std::endl << std::endl;
     std::cout << " ═══════════════════════════════════════════════════════════════════════ " << std::endl;
     std::cout << "server listening on port: " << this->port_ << std::endl;
+    std::cout << "Users connected: " << users_.size() << std::endl;
+
 };
 
 

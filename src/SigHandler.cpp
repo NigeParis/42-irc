@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   SigHandler.cpp                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/06/11 17:01:48 by nrobinso          #+#    #+#             */
+/*   Updated: 2025/06/11 17:01:51 by nrobinso         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../include/SigHandler.hpp"
 #include <iostream>
 
@@ -11,6 +23,5 @@ void SigHandler::handleStop(int signal) {
     if (signal == SIGINT) {
         std::cout << "killing process" << std::endl;
         SigHandler::sigloop = false;
-        //std::cout << "new sig value = " << SigHandler::sigloop << std::endl;
     }
 }
