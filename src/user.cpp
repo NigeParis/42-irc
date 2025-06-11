@@ -6,13 +6,13 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/06 11:07:49 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/11 11:32:25 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/11 17:25:54 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/user.hpp"
 
-User::User(int fd, short events, short revents) {
+User::User(int fd, short events, short revents): nickName_("guest"), userName_("default") {
 
 this->socketFd_ = fd;
 

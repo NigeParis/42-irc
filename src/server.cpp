@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/11 17:02:42 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/11 17:26:37 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,19 +54,20 @@ void Server::createServer(void) {
 
 void Server::makeUser(void) {
 
-    std::string name = "guest"; // default name
     struct sockaddr_in client_addr;
     socklen_t client_addr_len = sizeof(client_addr);
-
     
     int client_fd = accept(socket_, (struct sockaddr *)&client_addr, &client_addr_len);
+    if (client_fd == -1) {
+        std::cout << "Error: creating client FD" << std::endl;
+        SigHandler::sigloop = false;
+        return ;
+    }
     fcntl(client_fd, F_SETFL, O_NONBLOCK);
-    User* user = new User(client_fd, POLLIN, 0);
-    
+    User* user = new User(client_fd, POLLIN, 0);    
     users_.push_back(user);
-
+    std::string name = user->getNickName(); // default name
     user->setNickName(name);
-    
     sendMessage(*user, connectMessage(user));
 
    
@@ -122,6 +123,8 @@ void Server::addNewClient(epoll_event &user_ev, int epfd) {
 
         //std::cout << "New client detected! Calling makeUser()" << std::endl;
         makeUser();
+        if (SigHandler::sigloop == false)
+            return ;
         user_ev.events = EPOLLIN;
         user_ev.data.fd = users_.back()->user_pollfd.fd;
         epoll_ctl(epfd, EPOLL_CTL_ADD, users_.back()->user_pollfd.fd, &user_ev);
