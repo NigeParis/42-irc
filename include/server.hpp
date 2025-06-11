@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:08 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/11 13:52:16 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/11 16:10:37 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,9 @@ class Server {
         void getClientMessage (int client_fd);
         void putServerBanner(void);
         std::string connectMessage(User *user);
+        void addNewClient(epoll_event &user_ev, int epfd);
+
+        std::string  putClientBanner(void);
 
                     
         std::vector<User*> users_;

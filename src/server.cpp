@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/11 15:02:59 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/11 16:11:36 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ void Server::readMessage(User &user) {
         return ;
         }            
     }
-    if (checkfd != user.getUserFd()) {
+    if (checkfd != user.getUserFd() && buffer[0] != '\r') {
             std::cout << RED << "Received message: "  << RESET << "From " << user.getNickName() << ":\n";
     }
     if (bytes_read != -1 && buffer[0] != '\r') {
@@ -121,13 +121,22 @@ void Server::getClientMessage (int client_fd){
     } 
 };
 
+void Server::addNewClient(epoll_event &user_ev, int epfd) {
 
+        std::cout << "New client detected! Calling makeUser()" << std::endl;
+        makeUser();
+
+        user_ev.events = EPOLLIN;
+        user_ev.data.fd = users_.back()->user_pollfd.fd;
+        epoll_ctl(epfd, EPOLL_CTL_ADD, users_.back()->user_pollfd.fd, &user_ev);
+        std::cout << "Users connected: " << users_.size() << std::endl;
+};
 
 
 
 
 void Server::userLoopCheck() {
-    // std::cout << "userLoopCheck()" << std::endl;
+
     epoll_event events[BUFFER];
     struct epoll_event ev;
     struct epoll_event user_ev;
@@ -136,14 +145,11 @@ void Server::userLoopCheck() {
     if (epfd == -1) {
         perror("epoll_create failed");
         return;
-    }
-    
+    }    
     ev.events = EPOLLIN;
     ev.data.fd = this->socket_;
     epoll_ctl(epfd, EPOLL_CTL_ADD, this->socket_, &ev);
-
     while (SigHandler::sigloop) {
-        //std::cout << "sig value" << SigHandler::sigloop << std::endl;
         if (!SigHandler::sigloop) break;
 
         int num_events = epoll_wait(epfd, events, 10, 1000);
@@ -152,32 +158,22 @@ void Server::userLoopCheck() {
             perror("epoll_wait failed");
             break;
         }
-        //std::cout << "sig value" << SigHandler::sigloop << std::endl;
-        if (!SigHandler::sigloop) break;
-    
         for (int i = 0; i < num_events; ++i) {
             int fd = events[i].data.fd;
 
             if (fd == this->socket_ && (events[i].events & EPOLLIN)) {
-                std::cout << "New client detected! Calling makeUser()" << std::endl;
-                makeUser();
-
-                user_ev.events = EPOLLIN;
-                user_ev.data.fd = users_.back()->user_pollfd.fd;
-                epoll_ctl(epfd, EPOLL_CTL_ADD, users_.back()->user_pollfd.fd, &user_ev);
-                std::cout << "Users connected: " << users_.size() << std::endl;
-
-            }
+                addNewClient(user_ev, epfd);
+            } 
             else if (events[i].events & EPOLLIN) {  
-                if ((events[i].events & (EPOLLERR | EPOLLHUP)) == 0)           
+                if ((events[i].events & (EPOLLERR | EPOLLHUP)) == 0) {           
                     getClientMessage(fd);
+                }
             }
-
         }
     }
-
     close(epfd);
 }
+
 
 
 
@@ -188,8 +184,8 @@ void Server::userLoopCheck() {
 
 
 std::string Server::connectMessage(User *user) {
-    std::stringstream ss;
-    std::string message = "Welcome ";
+    std::stringstream ss; 
+    std::string message =  putClientBanner() + " Welcome ";
     ss << user->getUserFd();
     message += user->getNickName();
     //message += "#" + ss.str();
@@ -205,7 +201,7 @@ User* Server::findUserByFd(int fd) {
         }
     }
     return NULL;
-}
+}   
 
 
 void Server::putServerBanner(void) {
@@ -219,3 +215,25 @@ void Server::putServerBanner(void) {
     std::cout << " ═══════════════════════════════════════════════════════════════════════ " << std::endl;
     std::cout << "server listening on port: " << this->port_ << std::endl;
 };
+
+
+std::string  Server::putClientBanner(void) {
+
+    std::stringstream ss;
+
+    ss << " ██╗██████╗  ██████╗     ██████╗██╗     ██╗███████╗███╗   ██╗████████╗ \n";
+    ss << " ██║██╔══██╗██╔════╝    ██╔════╝██║     ██║██╔════╝████╗  ██║╚══██╔══╝ \n";
+    ss << " ██║██████╔╝██║         ██║     ██║     ██║█████╗  ██╔██╗ ██║   ██║ \n";
+    ss << " ██║██╔══██╗██║         ██║     ██║     ██║██╔══╝  ██║╚██╗██║   ██║\n";   
+    ss << " ██║██║  ██║╚██████╗    ╚██████╗███████╗██║███████╗██║ ╚████║   ██║ \n";
+    ss << " ═══════════════════════════════════════════════════════════════════════\n ";
+    ss << "connected on port: " << this->port_ << "\n";
+
+    return (ss.str());
+};
+
+
+
+
+   
+   
