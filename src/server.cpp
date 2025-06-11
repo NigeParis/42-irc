@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/11 14:16:34 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/11 15:02:59 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,9 +80,9 @@ void Server::makeUser(void) {
 void Server::readMessage(User &user) {
 
     std::string buffer(BUFFER, '\0');
+    static int checkfd;
     int fd = user.getUserFd();
     ssize_t bytes_read = recv(user.getUserFd(), &buffer[0], buffer.size() - 1, 0);
-        
     if (bytes_read == 0) {
         std::vector<User*>::iterator it = std::find(users_.begin(), users_.end(), &user);  
         delete &user;
@@ -92,8 +92,12 @@ void Server::readMessage(User &user) {
         return ;
         }            
     }
+    if (checkfd != user.getUserFd()) {
+            std::cout << RED << "Received message: "  << RESET << "From " << user.getNickName() << ":\n";
+    }
     if (bytes_read != -1 && buffer[0] != '\r') {
-        std::cout << RED << "Received message: "  << RESET;
+
+        checkfd = user.getUserFd();        
         std::cout << buffer;
     }
 };
@@ -206,12 +210,12 @@ User* Server::findUserByFd(int fd) {
 
 void Server::putServerBanner(void) {
 
-    std::cout << "███████╗███████╗██████╗██╗   ██╗███████╗██████╗     ██╗██████╗  ██████╗ " << std::endl;
-    std::cout << "█╔════╝██╔════╝██╔══██╗██║   ██║██╔════╝██╔══██╗    ██║██╔══██╗██╔════╝ "<< std::endl;
-    std::cout << "██████╗█████╗  ██████╔╝██║   ██║█████╗  ██████╔╝    ██║██████╔╝██║" << std::endl;
-    std::cout << "════██║██╔══╝  ██╔══██╗╚██╗ ██╔╝██╔══╝  ██╔══██╗    ██║██╔══██╗██║" << std::endl;   
-    std::cout << "██████║███████╗██║  ██║ ╚████╔╝ ███████╗██║  ██║    ██║██║  ██║╚██████╗ " << std::endl;
-    std::cout << "══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝    ╚═╝╚═╝  ╚═╝ ╚═════╝ " << std::endl << std::endl;
-    std::cout << "═══════════════════════════════════════════════════════════════════════ " << std::endl;
+    std::cout << " ███████╗███████╗██████╗██╗   ██╗███████╗██████╗     ██╗██████╗  ██████╗ " << std::endl;
+    std::cout << " █╔════╝██╔════╝██╔══██╗██║   ██║██╔════╝██╔══██╗    ██║██╔══██╗██╔════╝ "<< std::endl;
+    std::cout << " ██████╗█████╗  ██████╔╝██║   ██║█████╗  ██████╔╝    ██║██████╔╝██║" << std::endl;
+    std::cout << " ════██║██╔══╝  ██╔══██╗╚██╗ ██╔╝██╔══╝  ██╔══██╗    ██║██╔══██╗██║" << std::endl;   
+    std::cout << " ██████║███████╗██║  ██║ ╚████╔╝ ███████╗██║  ██║    ██║██║  ██║╚██████╗ " << std::endl;
+    std::cout << " ══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝    ╚═╝╚═╝  ╚═╝ ╚═════╝ " << std::endl << std::endl;
+    std::cout << " ═══════════════════════════════════════════════════════════════════════ " << std::endl;
     std::cout << "server listening on port: " << this->port_ << std::endl;
 };
