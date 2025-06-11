@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/11 17:53:24 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/11 19:02:42 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,14 +85,19 @@ void Server::readMessage(User &user) {
             if (it != users_.end()) {
                 users_.erase(it);
             close(fd);
-            std::cout << YELLOW << "Users connected: " << users_.size() << RESET << std::endl;
+            std::cout << GREEN << "Users connected: " << users_.size() << RESET << std::endl;
             return ;
         }            
     }
-    if (checkfd != user.getUserFd() && buffer[0] != '\r') {
+   
+
+    if (bytes_read && buffer[0] == '\r') {
+        return ;
+    }
+    if (bytes_read && checkfd != user.getUserFd() && buffer[0] != '\r') {
             std::cout << RED << "Received message: "  << RESET << "From " << user.getNickName() << ":\n";
     }
-    if (bytes_read != -1 && buffer[0] != '\r') {
+    if (bytes_read != -1) {
 
         checkfd = user.getUserFd();        
         std::cout << buffer;
