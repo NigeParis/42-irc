@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/11 14:03:02 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/11 14:16:34 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,13 +80,16 @@ void Server::makeUser(void) {
 void Server::readMessage(User &user) {
 
     std::string buffer(BUFFER, '\0');
+    int fd = user.getUserFd();
     ssize_t bytes_read = recv(user.getUserFd(), &buffer[0], buffer.size() - 1, 0);
+        
     if (bytes_read == 0) {
-        close(user.getUserFd());
         std::vector<User*>::iterator it = std::find(users_.begin(), users_.end(), &user);  
+        delete &user;
         if (it != users_.end()) {
             users_.erase(it);
-            return ;
+        close(fd);
+        return ;
         }            
     }
     if (bytes_read != -1 && buffer[0] != '\r') {
