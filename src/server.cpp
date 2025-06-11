@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/11 17:26:37 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/11 17:41:28 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,6 @@ Server::~Server() {
 
     
 };
-
 
 
 void Server::createServer(void) {
@@ -86,7 +85,7 @@ void Server::readMessage(User &user) {
             if (it != users_.end()) {
                 users_.erase(it);
             close(fd);
-            std::cout << "Users connected: " << users_.size() << std::endl;
+            std::cout << YELLOW << "Users connected: " << users_.size() << RESET << std::endl;
             return ;
         }            
     }
@@ -128,7 +127,7 @@ void Server::addNewClient(epoll_event &user_ev, int epfd) {
         user_ev.events = EPOLLIN;
         user_ev.data.fd = users_.back()->user_pollfd.fd;
         epoll_ctl(epfd, EPOLL_CTL_ADD, users_.back()->user_pollfd.fd, &user_ev);
-        std::cout << "Users connected: " << users_.size() << std::endl;
+        std::cout << YELLOW << "Users connected: " << users_.size() << RESET << std::endl;
 };
 
 
@@ -171,11 +170,6 @@ void Server::userLoopCheck() {
 }
 
 
-
-
-
-
-
 // Helper functions
 
 std::string Server::connectMessage(User *user) {
@@ -209,7 +203,7 @@ void Server::putServerBanner(void) {
     std::cout << " ══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝    ╚═╝╚═╝  ╚═╝ ╚═════╝ " << std::endl << std::endl;
     std::cout << " ═══════════════════════════════════════════════════════════════════════ " << std::endl;
     std::cout << "server listening on port: " << this->port_ << std::endl;
-    std::cout << "Users connected: " << users_.size() << std::endl;
+    std::cout << YELLOW << "Users connected: " << users_.size() << RESET << std::endl;
 
 };
 
