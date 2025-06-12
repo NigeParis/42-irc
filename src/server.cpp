@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/12 18:08:53 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/12 18:28:32 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,12 +145,11 @@ void Server::addNewClient(epoll_event &user_ev, int epfd) {
 void Server::runServerCommands(void) {
 
     std::string message;  
-    char rawBuffer[BUFFER] = {0};
-    ssize_t bytesRead = read(STDIN_FILENO, rawBuffer, BUFFER);
+    std::string buffer(BUFFER, '\0');
+    ssize_t bytesRead = read(STDIN_FILENO, &buffer[0], BUFFER);
 
     if (bytesRead > 0) {
-        rawBuffer[bytesRead - 1] = '\0';  // Remove newline character
-        std::string buffer(rawBuffer);
+        buffer[bytesRead - 1] = '\0';  // Remove newline character
         int commandType = ServerCommandStartsWith(buffer);
         if (commandType == NOTICE) {
             message += "[SERVER]:";
