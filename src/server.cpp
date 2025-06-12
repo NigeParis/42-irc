@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/12 18:28:32 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/12 18:51:20 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,8 @@ Server::~Server() {
 
 // for tests with SEND and sendMessageAll() function
 void Server::makeServerStdinNonBlocking(void) {
-    int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
-    fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
+    //int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
+    fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK);
 };
 
 
@@ -244,6 +244,7 @@ void Server::putServerBanner(void) {
     std::cout << " ══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝    ╚═╝╚═╝  ╚═╝ ╚═════╝ " << std::endl;
     std::cout << " ═══════════════════════════════════════════════════════════════════════ " << std::endl;
     std::cout << "server listening on port: " << this->port_ << std::endl;
+    std::cout << "server password: " << this->password_ << std::endl;
     std::cout << YELLOW << "Users connected: " << users_.size() << RESET << std::endl;
 
 };

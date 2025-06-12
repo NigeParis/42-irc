@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:53:53 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/11 17:42:58 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/12 18:49:12 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 int main(int argc, char *argv[]) {
     
     if (argc != 3) {
-        std::cout << "Error" << std::endl;
+        std::cout << "Error: ./ircserv <port> <password>" << std::endl;
         return(1);
     }
     signal(SIGINT, SigHandler::handleStop);
