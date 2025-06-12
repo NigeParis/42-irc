@@ -6,13 +6,13 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/12 16:58:31 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/12 18:08:53 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/server.hpp"
 
-Server::Server(int port, std::string password) : port_(port), password_(password){
+Server::Server(int port, std::string password) : port_(port), password_(password), lastWritersfd_(0) {
     //std::cout << "constructor" << " port: "<< port << " PW: " << password << std::endl;
 };
 
@@ -76,6 +76,7 @@ void Server::makeUser(void) {
     std::string name = user->getNickName(); // default name
     user->setNickName(name);
     sendMessage(*user, connectMessage(user));
+    std::cout << BLUE << "user: " << user->getNickName() << " enter dans IRC" << RESET << std::endl;
 
    
 }
@@ -84,15 +85,14 @@ void Server::makeUser(void) {
 void Server::readMessage(User &user) {
 
     std::string buffer(BUFFER, '\0');
-    struct timeval tv;
-    tv.tv_sec = 1;  // Set timeout to 30 seconds
-    tv.tv_usec = 0;
     static int checkfd;
+    
     int fd = user.getUserFd();
-    ssize_t bytes_read = recv(user.getUserFd(), &buffer[0], buffer.size() - 1, sizeof(tv));
+    ssize_t bytes_read = recv(user.getUserFd(), &buffer[0], buffer.size() - 1, 0);
     if (bytes_read == 0) {
-        std::cout << BLUE << "bytes_read = 0" << RESET << std::endl;
-        std::vector<User*>::iterator it = std::find(users_.begin(), users_.end(), &user);  
+        std::vector<User*>::iterator it = std::find(users_.begin(), users_.end(), &user);
+        std::cout << BLUE << "user: " << user.getNickName() << " left IRC" << RESET << std::endl;
+        this->lastWritersfd_ = 0;  
         close(fd);
         delete &user;
         if (it != users_.end()) {
@@ -105,32 +105,17 @@ void Server::readMessage(User &user) {
         std::cout << "error recv()" << std::endl;
         return ;
     }
+    else if (buffer[0] == '\r')
+        return;
     else if (bytes_read != -1) {
-        if (bytes_read && checkfd != user.getUserFd() && buffer[0] != '\r') {
+        if (bytes_read && lastWritersfd_ != user.getUserFd() && buffer[0] != '\r') {
             std::cout << RED << "Received message: "  << RESET << "From " << user.getNickName() << ":\n";
         }
-        checkfd = user.getUserFd();        
-        std::cout << buffer;
+        checkfd = user.getUserFd();
+        this->lastWritersfd_ = checkfd;        
+        std::cout << buffer;        
     }
 };
-
-
-
-void Server::sendMessage(User &user, std::string message) {
-
-    if (user.getUserFd() > -1 && !message.empty())
-        send(user.getUserFd(), message.c_str(), message.size(), 0);
-}
-
-
-void Server::sendMessageAll(std::string message) {
-
-    for (size_t i = 0;  i < users_.size(); i++)
-        send(users_[i]->getUserFd(), message.c_str(), message.size(), 0);
-}
-
-
-
 
 
 void Server::getClientMessage (int client_fd){
@@ -291,5 +276,27 @@ size_t Server::ServerCommandStartsWith(const std::string &str) {
 }
 
 
+
+void Server::setWriterFd(int fd) {
+    this->lastWritersfd_ = fd;    
+};
+
+int Server::getWriterFd(void) {
+    return (this->lastWritersfd_);
+};
    
    
+void Server::sendMessage(User &user, std::string message) {
+
+    if (user.getUserFd() > -1 && !message.empty())
+        send(user.getUserFd(), message.c_str(), message.size(), 0);
+}
+
+
+void Server::sendMessageAll(std::string message) {
+
+    for (size_t i = 0;  i < users_.size(); i++)
+        send(users_[i]->getUserFd(), message.c_str(), message.size(), 0);
+}
+
+

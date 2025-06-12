@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:08 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/12 16:57:44 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/12 17:53:39 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,15 +81,19 @@ class Server {
         void runServerCommands(void);
         size_t ServerCommandStartsWith(const std::string &str);
 
-
-                    
+        void setWriterFd(int fd);
+        int getWriterFd(void);
+        
+        
         std::vector<User*> users_;
+
         
         private:
         
         int port_;
         int socket_;
         std::string password_;
+        int lastWritersfd_;
         
 
     
