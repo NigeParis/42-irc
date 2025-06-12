@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:08 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/11 18:53:32 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/12 16:57:44 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 #include <netinet/in.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <string>
 
 #include <sys/epoll.h>
 #include <cstdio>
@@ -43,6 +44,15 @@
 
 
 #define BUFFER 1024
+
+
+enum ServerCommands {
+
+    NOTICE,
+    EXIT    
+};
+
+
 
 class User;
 
@@ -65,6 +75,11 @@ class Server {
         void addNewClient(epoll_event &user_ev, int epfd);
 
         std::string  putClientBanner(void);
+
+        void sendMessageAll(std::string message);
+        void makeServerStdinNonBlocking(void);
+        void runServerCommands(void);
+        size_t ServerCommandStartsWith(const std::string &str);
 
 
                     

@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/11 19:02:42 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/12 16:58:31 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,12 @@ Server::~Server() {
     close(this->socket_);
 
     
+};
+
+// for tests with SEND and sendMessageAll() function
+void Server::makeServerStdinNonBlocking(void) {
+    int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
+    fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
 };
 
 
@@ -48,6 +54,8 @@ void Server::createServer(void) {
     listen(this->socket_, 10); 
 
     putServerBanner();
+    makeServerStdinNonBlocking(); // Set stdin to non-blocking mode
+    
 };
 
 
@@ -76,29 +84,31 @@ void Server::makeUser(void) {
 void Server::readMessage(User &user) {
 
     std::string buffer(BUFFER, '\0');
+    struct timeval tv;
+    tv.tv_sec = 1;  // Set timeout to 30 seconds
+    tv.tv_usec = 0;
     static int checkfd;
     int fd = user.getUserFd();
-    ssize_t bytes_read = recv(user.getUserFd(), &buffer[0], buffer.size() - 1, 0);
+    ssize_t bytes_read = recv(user.getUserFd(), &buffer[0], buffer.size() - 1, sizeof(tv));
     if (bytes_read == 0) {
-            std::vector<User*>::iterator it = std::find(users_.begin(), users_.end(), &user);  
-            delete &user;
-            if (it != users_.end()) {
-                users_.erase(it);
-            close(fd);
+        std::cout << BLUE << "bytes_read = 0" << RESET << std::endl;
+        std::vector<User*>::iterator it = std::find(users_.begin(), users_.end(), &user);  
+        close(fd);
+        delete &user;
+        if (it != users_.end()) {
+            users_.erase(it);
             std::cout << GREEN << "Users connected: " << users_.size() << RESET << std::endl;
             return ;
         }            
     }
-   
-
-    if (bytes_read && buffer[0] == '\r') {
+    if (bytes_read == -1) {
+        std::cout << "error recv()" << std::endl;
         return ;
     }
-    if (bytes_read && checkfd != user.getUserFd() && buffer[0] != '\r') {
+    else if (bytes_read != -1) {
+        if (bytes_read && checkfd != user.getUserFd() && buffer[0] != '\r') {
             std::cout << RED << "Received message: "  << RESET << "From " << user.getNickName() << ":\n";
-    }
-    if (bytes_read != -1) {
-
+        }
         checkfd = user.getUserFd();        
         std::cout << buffer;
     }
@@ -110,9 +120,17 @@ void Server::sendMessage(User &user, std::string message) {
 
     if (user.getUserFd() > -1 && !message.empty())
         send(user.getUserFd(), message.c_str(), message.size(), 0);
-
-    
 }
+
+
+void Server::sendMessageAll(std::string message) {
+
+    for (size_t i = 0;  i < users_.size(); i++)
+        send(users_[i]->getUserFd(), message.c_str(), message.size(), 0);
+}
+
+
+
 
 
 void Server::getClientMessage (int client_fd){
@@ -136,7 +154,39 @@ void Server::addNewClient(epoll_event &user_ev, int epfd) {
 };
 
 
+
+
+
+void Server::runServerCommands(void) {
+
+    std::string message;  
+    char rawBuffer[BUFFER] = {0};
+    ssize_t bytesRead = read(STDIN_FILENO, rawBuffer, BUFFER);
+
+    if (bytesRead > 0) {
+        rawBuffer[bytesRead - 1] = '\0';  // Remove newline character
+        std::string buffer(rawBuffer);
+        int commandType = ServerCommandStartsWith(buffer);
+        if (commandType == NOTICE) {
+            message += "[SERVER]:";
+            message += buffer.substr(9, bytesRead);
+            message += "\n";
+            if (message.size() > 20) {
+                sendMessageAll(message);  // Send message to all clients
+            }
+        }
+        if (commandType == EXIT) {
+            SigHandler::sigloop = false;
+        }
+    }  
+};
+
+
+
+
+
 void Server::userLoopCheck() {
+
 
     epoll_event events[BUFFER];
     struct epoll_event ev;
@@ -169,7 +219,9 @@ void Server::userLoopCheck() {
                     getClientMessage(fd);
                 }
             }
-        }        
+        } 
+
+        runServerCommands();
     }
     close(epfd);
 }
@@ -220,15 +272,23 @@ std::string  Server::putClientBanner(void) {
     ss << " ██╗██████╗  ██████╗     ██████╗██╗     ██╗███████╗███╗   ██╗████████╗ \n";
     ss << " ██║██╔══██╗██╔════╝    ██╔════╝██║     ██║██╔════╝████╗  ██║╚══██╔══╝ \n";
     ss << " ██║██████╔╝██║         ██║     ██║     ██║█████╗  ██╔██╗ ██║   ██║ \n";
-    ss << " ██║██╔══██╗██║         ██║     ██║     ██║██╔══╝  ██║╚██╗██║   ██║\n";   
+    ss << " ██║██╔══██╗██║         ██║     ██║     ██║██╔══╝  ██║╚██╗██║   ██║ \n";   
     ss << " ██║██║  ██║╚██████╗    ╚██████╗███████╗██║███████╗██║ ╚████║   ██║ \n";
-    ss << " ═══════════════════════════════════════════════════════════════════════\n ";
+    ss << " ══════════════════════════════════════════════════════════════════ \n ";
     ss << "connected on port: " << this->port_ << "\n";
 
     return (ss.str());
 };
 
 
+size_t Server::ServerCommandStartsWith(const std::string &str) {
+    
+    if (str.find("NOTICE $*") == 0)
+        return (NOTICE);
+    if (str.find("EXIT") == 0)
+        return (EXIT);
+    return (0);
+}
 
 
    
