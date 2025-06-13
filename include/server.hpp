@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:08 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/12 17:53:39 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/13 09:31:01 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@
 
 #include "user.hpp"
 #include "SigHandler.hpp"
+#include "serverCommands.hpp"
 
 #define RED "\033[31m"
 #define BLUE "\033[34m"
@@ -73,16 +74,22 @@ class Server {
         void putServerBanner(void);
         std::string connectMessage(User *user);
         void addNewClient(epoll_event &user_ev, int epfd);
-
         std::string  putClientBanner(void);
 
-        void sendMessageAll(std::string message);
-        void makeServerStdinNonBlocking(void);
-        void runServerCommands(void);
-        size_t ServerCommandStartsWith(const std::string &str);
 
+        void sendMessageAll(std::string message);
+        size_t ServerCommandStartsWith(const std::string &str);
+        
         void setWriterFd(int fd);
         int getWriterFd(void);
+        
+        // server commands
+        void makeServerStdinNonBlocking(void);
+        void runServerCommands(void);
+        void serverExitCommand(size_t commandType, ssize_t bytesRead, std::string &buffer);
+        void serverWallopsCommand(size_t commandType, ssize_t bytesRead, std::string &buffer);
+        
+        
         
         
         std::vector<User*> users_;

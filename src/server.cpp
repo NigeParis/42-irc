@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/12 18:51:20 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/13 09:33:24 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,11 +28,7 @@ Server::~Server() {
     
 };
 
-// for tests with SEND and sendMessageAll() function
-void Server::makeServerStdinNonBlocking(void) {
-    //int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
-    fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK);
-};
+
 
 
 void Server::createServer(void) {
@@ -142,33 +138,6 @@ void Server::addNewClient(epoll_event &user_ev, int epfd) {
 
 
 
-void Server::runServerCommands(void) {
-
-    std::string message;  
-    std::string buffer(BUFFER, '\0');
-    ssize_t bytesRead = read(STDIN_FILENO, &buffer[0], BUFFER);
-
-    if (bytesRead > 0) {
-        buffer[bytesRead - 1] = '\0';  // Remove newline character
-        int commandType = ServerCommandStartsWith(buffer);
-        if (commandType == NOTICE) {
-            message += "[SERVER]:";
-            message += buffer.substr(9, bytesRead);
-            message += "\n";
-            if (message.size() > 20) {
-                sendMessageAll(message);  // Send message to all clients
-            }
-        }
-        if (commandType == EXIT) {
-            SigHandler::sigloop = false;
-        }
-    }  
-};
-
-
-
-
-
 void Server::userLoopCheck() {
 
 
@@ -265,15 +234,6 @@ std::string  Server::putClientBanner(void) {
     return (ss.str());
 };
 
-
-size_t Server::ServerCommandStartsWith(const std::string &str) {
-    
-    if (str.find("NOTICE $*") == 0)
-        return (NOTICE);
-    if (str.find("EXIT") == 0)
-        return (EXIT);
-    return (0);
-}
 
 
 
