@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/13 09:33:24 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/13 10:01:32 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,11 +105,14 @@ void Server::readMessage(User &user) {
         return;
     else if (bytes_read != -1) {
         if (bytes_read && lastWritersfd_ != user.getUserFd() && buffer[0] != '\r') {
-            std::cout << RED << "Received message: "  << RESET << "From " << user.getNickName() << ":\n";
+            std::cout << RED << "Received message: "  << RESET << "[" << user.getNickName() << "]: ";
         }
         checkfd = user.getUserFd();
-        this->lastWritersfd_ = checkfd;        
-        std::cout << buffer;        
+        std::cout << buffer; 
+        if (buffer[bytes_read - 2] == '\r')
+            this->lastWritersfd_ = 0;
+        else      
+            this->lastWritersfd_ = checkfd;
     }
 };
 

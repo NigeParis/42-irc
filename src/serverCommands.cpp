@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/13 08:36:07 by nrobinso          #+#    #+#             */
-/*   Updated: 2025/06/13 09:34:03 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/13 10:08:15 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,9 @@ size_t Server::ServerCommandStartsWith(const std::string &str) {
         return (NOTICE);
     if (str.find("/squit ") == 0)
         return (EXIT);
-    if (str.substr(0,6) == "/squit")
+
+    std::string command = str.substr(0,6);
+    if (command == "/squit")
         return (EXIT);
     return (0);
 }
