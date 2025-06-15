@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:08 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/13 09:31:01 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/13 11:52:02 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,8 @@
 #include <cstdio>
 #include <sstream>
 #include <algorithm>
+#include <ctime>
+#include <iomanip>
 
 #include "user.hpp"
 #include "SigHandler.hpp"
@@ -88,7 +90,7 @@ class Server {
         void runServerCommands(void);
         void serverExitCommand(size_t commandType, ssize_t bytesRead, std::string &buffer);
         void serverWallopsCommand(size_t commandType, ssize_t bytesRead, std::string &buffer);
-        
+        void timeStamp(void);
         
         
         

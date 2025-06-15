@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/13 10:01:32 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/13 13:22:55 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,6 @@ Server::~Server() {
 
     
 };
-
-
 
 
 void Server::createServer(void) {
@@ -72,7 +70,8 @@ void Server::makeUser(void) {
     std::string name = user->getNickName(); // default name
     user->setNickName(name);
     sendMessage(*user, connectMessage(user));
-    std::cout << BLUE << "user: " << user->getNickName() << " enter dans IRC" << RESET << std::endl;
+    Server::timeStamp(); 
+    std::cout << BLUE << "[LOGIN]     " << RESET << "<" << GREEN << user->getNickName() << RESET << ">" << " Just arrived " << std::endl;
 
    
 }
@@ -87,13 +86,17 @@ void Server::readMessage(User &user) {
     ssize_t bytes_read = recv(user.getUserFd(), &buffer[0], buffer.size() - 1, 0);
     if (bytes_read == 0) {
         std::vector<User*>::iterator it = std::find(users_.begin(), users_.end(), &user);
-        std::cout << BLUE << "user: " << user.getNickName() << " left IRC" << RESET << std::endl;
+        Server::timeStamp(); 
+        std::cout << BLUE << "[LOGOUT]    " << RESET << "<" << GREEN << user.getNickName() << RESET << ">" << " Just left " << std::endl;
+        
+        //std::cout << BLUE << "user: " << user.getNickName() << " left IRC" << RESET << std::endl;
         this->lastWritersfd_ = 0;  
         close(fd);
         delete &user;
         if (it != users_.end()) {
             users_.erase(it);
-            std::cout << GREEN << "Users connected: " << users_.size() << RESET << std::endl;
+            Server::timeStamp(); 
+            std::cout << YELLOW << "[CLIENTS]   " << RESET << users_.size() << std::endl;
             return ;
         }            
     }
@@ -105,7 +108,8 @@ void Server::readMessage(User &user) {
         return;
     else if (bytes_read != -1) {
         if (bytes_read && lastWritersfd_ != user.getUserFd() && buffer[0] != '\r') {
-            std::cout << RED << "Received message: "  << RESET << "[" << user.getNickName() << "]: ";
+            Server::timeStamp(); 
+            std::cout << RED << "[MESSAGE]   " << RESET << "<" << GREEN << user.getNickName() << RESET << "> " << RESET;
         }
         checkfd = user.getUserFd();
         std::cout << buffer; 
@@ -134,14 +138,15 @@ void Server::addNewClient(epoll_event &user_ev, int epfd) {
         user_ev.events = EPOLLIN;
         user_ev.data.fd = users_.back()->user_pollfd.fd;
         epoll_ctl(epfd, EPOLL_CTL_ADD, users_.back()->user_pollfd.fd, &user_ev);
-        std::cout << YELLOW << "Users connected: " << users_.size() << RESET << std::endl;
+        Server::timeStamp(); 
+        std::cout << YELLOW << "[CLIENTS]   " << RESET << users_.size() << std::endl;
 };
 
 
 
 
 
-void Server::userLoopCheck() {
++void Server::userLoopCheck() {
 
 
     epoll_event events[BUFFER];
@@ -187,13 +192,13 @@ void Server::userLoopCheck() {
 
 std::string Server::connectMessage(User *user) {
     std::stringstream ss; 
-    std::string message =  putClientBanner() + " Welcome ";
+    std::string message =  putClientBanner() +"[SERVER]: Welcome ";
     ss << user->getUserFd();
     message += user->getNickName();
     //message += "#" + ss.str();
     message += "\n";
     return (message);
-}
+};
 
 
 User* Server::findUserByFd(int fd) {
@@ -203,21 +208,23 @@ User* Server::findUserByFd(int fd) {
         }
     }
     return NULL;
-}   
+};
 
 
 void Server::putServerBanner(void) {
 
-    std::cout << " ███████╗███████╗██████╗██╗   ██╗███████╗██████╗     ██╗██████╗  ██████╗ " << std::endl;
-    std::cout << " █╔════╝██╔════╝██╔══██╗██║   ██║██╔════╝██╔══██╗    ██║██╔══██╗██╔════╝ "<< std::endl;
-    std::cout << " ██████╗█████╗  ██████╔╝██║   ██║█████╗  ██████╔╝    ██║██████╔╝██║" << std::endl;
-    std::cout << " ════██║██╔══╝  ██╔══██╗╚██╗ ██╔╝██╔══╝  ██╔══██╗    ██║██╔══██╗██║" << std::endl;   
-    std::cout << " ██████║███████╗██║  ██║ ╚████╔╝ ███████╗██║  ██║    ██║██║  ██║╚██████╗ " << std::endl;
-    std::cout << " ══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝    ╚═╝╚═╝  ╚═╝ ╚═════╝ " << std::endl;
-    std::cout << " ═══════════════════════════════════════════════════════════════════════ " << std::endl;
+    std::cout << "███████╗███████╗██████╗██╗   ██╗███████╗██████╗     ██╗██████╗  ██████╗ " << std::endl;
+    std::cout << "█╔════╝██╔════╝██╔══██╗██║   ██║██╔════╝██╔══██╗    ██║██╔══██╗██╔════╝ "<< std::endl;
+    std::cout << "██████╗█████╗  ██████╔╝██║   ██║█████╗  ██████╔╝    ██║██████╔╝██║" << std::endl;
+    std::cout << "════██║██╔══╝  ██╔══██╗╚██╗ ██╔╝██╔══╝  ██╔══██╗    ██║██╔══██╗██║" << std::endl;   
+    std::cout << "██████║███████╗██║  ██║ ╚████╔╝ ███████╗██║  ██║    ██║██║  ██║╚██████╗ " << std::endl;
+    std::cout << "══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝    ╚═╝╚═╝  ╚═╝ ╚═════╝ " << std::endl;
+    std::cout << "═══════════════════════════════════════════════════════════════════════ " << std::endl;
     std::cout << "server listening on port: " << this->port_ << std::endl;
     std::cout << "server password: " << this->password_ << std::endl;
+    std::cout << std::endl;
     std::cout << YELLOW << "Users connected: " << users_.size() << RESET << std::endl;
+    std::cout << "═══════════════════════════════════════════════════════════════════════ " << std::endl;
 
 };
 
@@ -226,12 +233,12 @@ std::string  Server::putClientBanner(void) {
 
     std::stringstream ss;
 
-    ss << " ██╗██████╗  ██████╗     ██████╗██╗     ██╗███████╗███╗   ██╗████████╗ \n";
-    ss << " ██║██╔══██╗██╔════╝    ██╔════╝██║     ██║██╔════╝████╗  ██║╚══██╔══╝ \n";
-    ss << " ██║██████╔╝██║         ██║     ██║     ██║█████╗  ██╔██╗ ██║   ██║ \n";
-    ss << " ██║██╔══██╗██║         ██║     ██║     ██║██╔══╝  ██║╚██╗██║   ██║ \n";   
-    ss << " ██║██║  ██║╚██████╗    ╚██████╗███████╗██║███████╗██║ ╚████║   ██║ \n";
-    ss << " ══════════════════════════════════════════════════════════════════ \n ";
+    ss << "██╗██████╗  ██████╗     ██████╗██╗     ██╗███████╗███╗   ██╗████████╗ \n";
+    ss << "██║██╔══██╗██╔════╝    ██╔════╝██║     ██║██╔════╝████╗  ██║╚══██╔══╝ \n";
+    ss << "██║██████╔╝██║         ██║     ██║     ██║█████╗  ██╔██╗ ██║   ██║ \n";
+    ss << "██║██╔══██╗██║         ██║     ██║     ██║██╔══╝  ██║╚██╗██║   ██║ \n";   
+    ss << "██║██║  ██║╚██████╗    ╚██████╗███████╗██║███████╗██║ ╚████║   ██║ \n";
+    ss << "══════════════════════════════════════════════════════════════════ \n";
     ss << "connected on port: " << this->port_ << "\n";
 
     return (ss.str());
@@ -253,13 +260,26 @@ void Server::sendMessage(User &user, std::string message) {
 
     if (user.getUserFd() > -1 && !message.empty())
         send(user.getUserFd(), message.c_str(), message.size(), 0);
-}
+};
 
 
 void Server::sendMessageAll(std::string message) {
 
     for (size_t i = 0;  i < users_.size(); i++)
         send(users_[i]->getUserFd(), message.c_str(), message.size(), 0);
-}
+};
 
 
+void Server::timeStamp(void) {
+
+    std::time_t now = std::time(NULL);
+    std::tm *localTime = std::localtime(&now);
+    
+    std::cout 
+    << std::setfill('0') 
+    << std::setw(2) << localTime->tm_hour 
+    << ":" 
+    << std::setw(2) << localTime->tm_min 
+    << ":" << std::setw(2) 
+    << localTime->tm_sec << " ";
+};
