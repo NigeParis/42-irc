@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:08 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/13 11:52:02 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/15 14:42:23 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@
 #include "user.hpp"
 #include "SigHandler.hpp"
 #include "serverCommands.hpp"
+#include "parsing.hpp"
 
 #define RED "\033[31m"
 #define BLUE "\033[34m"
@@ -92,7 +93,13 @@ class Server {
         void serverWallopsCommand(size_t commandType, ssize_t bytesRead, std::string &buffer);
         void timeStamp(void);
         
-        
+        void pong(int socket, std::string message);
+
+
+        //parsing commands
+        void printInputCommand (int socket, std::string &inputClient); 
+
+
         
         std::vector<User*> users_;
 

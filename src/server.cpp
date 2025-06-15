@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/13 13:22:55 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/15 14:42:57 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ void Server::makeUser(void) {
     users_.push_back(user);
     std::string name = user->getNickName(); // default name
     user->setNickName(name);
-    sendMessage(*user, connectMessage(user));
+    //sendMessage(*user, connectMessage(user));
     Server::timeStamp(); 
     std::cout << BLUE << "[LOGIN]     " << RESET << "<" << GREEN << user->getNickName() << RESET << ">" << " Just arrived " << std::endl;
 
@@ -112,7 +112,11 @@ void Server::readMessage(User &user) {
             std::cout << RED << "[MESSAGE]   " << RESET << "<" << GREEN << user.getNickName() << RESET << "> " << RESET;
         }
         checkfd = user.getUserFd();
-        std::cout << buffer; 
+        std::cout << buffer;
+
+        printInputCommand(user.getUserFd(), buffer);        
+
+        
         if (buffer[bytes_read - 2] == '\r')
             this->lastWritersfd_ = 0;
         else      
@@ -146,7 +150,7 @@ void Server::addNewClient(epoll_event &user_ev, int epfd) {
 
 
 
-+void Server::userLoopCheck() {
+void Server::userLoopCheck() {
 
 
     epoll_event events[BUFFER];
@@ -168,7 +172,6 @@ void Server::addNewClient(epoll_event &user_ev, int epfd) {
         if (num_events < 0) {
             if (!SigHandler::sigloop) break;
             perror("epoll_wait failed");
-            break;
         }
         for (int i = 0; i < num_events; ++i) {
             int fd = events[i].data.fd;
@@ -213,7 +216,7 @@ User* Server::findUserByFd(int fd) {
 
 void Server::putServerBanner(void) {
 
-    std::cout << "███████╗███████╗██████╗██╗   ██╗███████╗██████╗     ██╗██████╗  ██████╗ " << std::endl;
+    std::cout << "██████╗███████╗██████╗ ██╗   ██╗███████╗██████╗     ██╗██████╗  ██████╗ " << std::endl;
     std::cout << "█╔════╝██╔════╝██╔══██╗██║   ██║██╔════╝██╔══██╗    ██║██╔══██╗██╔════╝ "<< std::endl;
     std::cout << "██████╗█████╗  ██████╔╝██║   ██║█████╗  ██████╔╝    ██║██████╔╝██║" << std::endl;
     std::cout << "════██║██╔══╝  ██╔══██╗╚██╗ ██╔╝██╔══╝  ██╔══██╗    ██║██╔══██╗██║" << std::endl;   

@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/13 08:36:07 by nrobinso          #+#    #+#             */
-/*   Updated: 2025/06/13 12:15:17 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/15 16:00:37 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,12 +61,9 @@ void Server::serverWallopsCommand(size_t commandType, ssize_t bytesRead, std::st
     std::string message;  
 
      if (commandType == NOTICE) {
-            message += "[SERVER]:";
-            message += buffer.substr(8, bytesRead);
-            message += "\n";
-            if (message.size() > 20) {
-                sendMessageAll(message);  // Send message to all clients
-            }
+            message += buffer.substr(9, bytesRead);
+            message += "\r\n";
+            sendMessageAll(message);  // Send message to all clients
      }
 };
 
@@ -75,3 +72,18 @@ void Server::serverWallopsCommand(size_t commandType, ssize_t bytesRead, std::st
 void Server::makeServerStdinNonBlocking(void) {
     fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK);
 };
+
+
+
+void Server::pong(int socket, std::string message) {
+
+    std::string buildMessage;
+    
+    buildMessage = "PONG :";
+    buildMessage += message;
+    buildMessage += "\r\n";
+    
+    send(socket, buildMessage.c_str(), buildMessage.size(), 0);
+    std::cout << "Pong message: " << "'" << buildMessage << "'" << std::endl;
+    
+}
