@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/16 11:30:02 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/16 12:28:30 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ void Server::makeUser(void) {
     
     int client_fd = accept(socket_, (struct sockaddr *)&client_addr, &client_addr_len);
     if (client_fd == -1) {
-        std::cout << "Error: creating client FD" << std::endl;
+        std::cout << "Error: creating FD du client" << std::endl;
         SigHandler::sigloop = false;
         return ;
     }
