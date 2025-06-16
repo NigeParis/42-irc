@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:08 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/16 10:52:23 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/16 20:23:24 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,15 +49,6 @@
 
 #define BUFFER 1024
 
-
-enum ServerCommands {
-
-    NOTICE,
-    EXIT    
-};
-
-
-
 class User;
 
 class Server {
@@ -80,18 +71,10 @@ class Server {
 
 
         void sendMessageAll(std::string message);
-        size_t ServerCommandStartsWith(const std::string &str);
-        
-        void setWriterFd(int fd);
-        int getWriterFd(void);
-        
-        // server commands
-        void makeServerStdinNonBlocking(void);
-        void runServerCommands(void);
-        void serverExitCommand(size_t commandType, ssize_t bytesRead, std::string &buffer);
-        void serverWallopsCommand(size_t commandType, ssize_t bytesRead, std::string &buffer);
+
         void timeStamp(void);
 
+        User* findByNick(std::string nick);
 
 
 

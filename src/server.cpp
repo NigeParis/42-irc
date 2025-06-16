@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/16 11:30:02 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/16 20:23:35 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,6 @@ void Server::createServer(void) {
     bind(this->socket_, (struct sockaddr*)&addressServer, sizeof(addressServer));
     listen(this->socket_, 10); 
     putServerBanner();
-    makeServerStdinNonBlocking(); // Set stdin to non-blocking mode    
 };
 
 
@@ -121,12 +120,8 @@ void Server::getClientMessage (int client_fd){
 };
 
 
-
-
-
 void Server::addNewClient(epoll_event &user_ev, int epfd) {
 
-        //std::cout << "New client detected! Calling makeUser()" << std::endl;
         makeUser();
         if (SigHandler::sigloop == false)
         return ;
@@ -136,9 +131,6 @@ void Server::addNewClient(epoll_event &user_ev, int epfd) {
         Server::timeStamp(); 
         std::cout << YELLOW << "[CLIENTS]   " << RESET << users_.size() << std::endl;
 };
-
-
-
 
 
 void Server::userLoopCheck() {
@@ -175,8 +167,6 @@ void Server::userLoopCheck() {
                 }
             }
         } 
-
-        runServerCommands(); // commands used for building and checking - to be deleted when finnished
     }
     close(epfd);
 }
@@ -226,17 +216,6 @@ std::string  Server::putClientBanner(void) {
     return (ss.str());
 };
 
-
-
-
-void Server::setWriterFd(int fd) {
-    this->lastClientToWrite_ = fd;    
-};
-
-int Server::getWriterFd(void) {
-    return (this->lastClientToWrite_);
-};
-   
    
 void Server::sendMessage(User &user, std::string message) {
 
