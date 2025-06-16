@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/16 12:28:30 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/16 20:31:22 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,6 @@ void Server::createServer(void) {
     bind(this->socket_, (struct sockaddr*)&addressServer, sizeof(addressServer));
     listen(this->socket_, 10); 
     putServerBanner();
-    makeServerStdinNonBlocking(); // Set stdin to non-blocking mode    
 };
 
 
@@ -176,7 +175,6 @@ void Server::userLoopCheck() {
             }
         } 
 
-        runServerCommands(); // commands used for building and checking - to be deleted when finnished
     }
     close(epfd);
 }
