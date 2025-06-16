@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:08 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/16 20:23:24 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/16 20:35:13 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,15 +69,10 @@ class Server {
         void addNewClient(epoll_event &user_ev, int epfd);
         std::string  putClientBanner(void);
 
-
         void sendMessageAll(std::string message);
 
+
         void timeStamp(void);
-
-        User* findByNick(std::string nick);
-
-
-
         void pong(int socket, std::string message);
         int cap(int socket, std::string message);
 
@@ -89,8 +84,7 @@ class Server {
         
         std::vector<User*> users_;
 
-        
-        private:
+    private:
         
         int port_;
         int socket_;
