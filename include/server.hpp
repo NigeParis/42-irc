@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:08 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/15 14:42:23 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/16 09:28:20 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,10 +94,11 @@ class Server {
         void timeStamp(void);
         
         void pong(int socket, std::string message);
+        int cap(int socket, std::string message);
 
 
         //parsing commands
-        void printInputCommand (int socket, std::string &inputClient); 
+        void clientInputCommand (int socket, std::string &inputClient); 
 
 
         
