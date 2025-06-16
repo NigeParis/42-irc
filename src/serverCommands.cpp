@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/13 08:36:07 by nrobinso          #+#    #+#             */
-/*   Updated: 2025/06/16 08:34:52 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/16 10:32:50 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,33 +74,3 @@ void Server::makeServerStdinNonBlocking(void) {
 };
 
 
-
-void Server::pong(int socket, std::string message) {
-
-    std::string buildMessage;
-    
-    buildMessage = "PONG ";
-    buildMessage += message;
-    buildMessage += "\r\n";
-    
-    send(socket, buildMessage.c_str(), buildMessage.size(), 0);
-    //std::cout << "Pong message: " << "'" << buildMessage << "'" << std::endl;
-    
-}
-
-
-int Server::cap(int socket, std::string message) {
-
-    std::string buildMessage;
-    
-    buildMessage = message;
-    //buildMessage += "\r\n";
-    
-    if ((send(socket, buildMessage.c_str(), buildMessage.size(), 0)) > 0) {
-
-    
-        return (0);
-    }
-    
-    return (1);
-};

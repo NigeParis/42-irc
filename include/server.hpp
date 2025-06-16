@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:08 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/16 09:28:20 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/16 10:52:23 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,6 @@ class Server {
         User* findUserByFd(int fd);
         void getClientMessage (int client_fd);
         void putServerBanner(void);
-        std::string connectMessage(User *user);
         void addNewClient(epoll_event &user_ev, int epfd);
         std::string  putClientBanner(void);
 
@@ -92,14 +91,17 @@ class Server {
         void serverExitCommand(size_t commandType, ssize_t bytesRead, std::string &buffer);
         void serverWallopsCommand(size_t commandType, ssize_t bytesRead, std::string &buffer);
         void timeStamp(void);
-        
+
+
+
+
         void pong(int socket, std::string message);
         int cap(int socket, std::string message);
 
 
         //parsing commands
         void clientInputCommand (int socket, std::string &inputClient); 
-
+        
 
         
         std::vector<User*> users_;
@@ -110,7 +112,7 @@ class Server {
         int port_;
         int socket_;
         std::string password_;
-        int lastWritersfd_;
+        int lastClientToWrite_;
         
 
     

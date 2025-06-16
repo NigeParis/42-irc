@@ -6,13 +6,13 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/16 09:28:00 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/16 11:30:02 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/server.hpp"
 
-Server::Server(int port, std::string password) : port_(port), password_(password), lastWritersfd_(0) {
+Server::Server(int port, std::string password) : port_(port), password_(password), lastClientToWrite_(0) {
     //std::cout << "constructor" << " port: "<< port << " PW: " << password << std::endl;
 };
 
@@ -23,9 +23,7 @@ Server::~Server() {
         delete users_[i];
     }
     users_.clear();
-    close(this->socket_);
-
-    
+    close(this->socket_);    
 };
 
 
@@ -36,20 +34,14 @@ void Server::createServer(void) {
     this->socket_ = socket(AF_INET, SOCK_STREAM, 0);
     int opt = 1;
     setsockopt(this->socket_, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
-
-
     memset(&addressServer, 0, sizeof(addressServer));
     addressServer.sin_family = AF_INET;
     addressServer.sin_addr.s_addr = INADDR_ANY;
     addressServer.sin_port = htons(this->port_);
-
-
     bind(this->socket_, (struct sockaddr*)&addressServer, sizeof(addressServer));
     listen(this->socket_, 10); 
-
     putServerBanner();
-    makeServerStdinNonBlocking(); // Set stdin to non-blocking mode
-    
+    makeServerStdinNonBlocking(); // Set stdin to non-blocking mode    
 };
 
 
@@ -69,11 +61,8 @@ void Server::makeUser(void) {
     users_.push_back(user);
     std::string name = user->getNickName(); // default name
     user->setNickName(name);
-    //sendMessage(*user, connectMessage(user));
     Server::timeStamp(); 
-    std::cout << BLUE << "[LOGIN]     " << RESET << "<" << GREEN << user->getNickName() << RESET << ">" << " Just arrived " << std::endl;
-
-   
+    std::cout << BLUE << "[LOGIN]     " << RESET << "<" << GREEN << user->getNickName() << RESET << ">" << " Just arrived " << std::endl;   
 }
 
 
@@ -88,9 +77,7 @@ void Server::readMessage(User &user) {
         std::vector<User*>::iterator it = std::find(users_.begin(), users_.end(), &user);
         Server::timeStamp(); 
         std::cout << BLUE << "[LOGOUT]    " << RESET << "<" << GREEN << user.getNickName() << RESET << ">" << " Just left " << std::endl;
-        
-        //std::cout << BLUE << "user: " << user.getNickName() << " left IRC" << RESET << std::endl;
-        this->lastWritersfd_ = 0;  
+        this->lastClientToWrite_ = 0;  
         close(fd);
         delete &user;
         if (it != users_.end()) {
@@ -107,20 +94,20 @@ void Server::readMessage(User &user) {
     else if (buffer[0] == '\r')
         return;
     else if (bytes_read != -1) {
-        if (bytes_read && lastWritersfd_ != user.getUserFd() && buffer[0] != '\r') {
+        if (bytes_read && lastClientToWrite_ != user.getUserFd() && buffer[0] != '\r') {
             Server::timeStamp(); 
             std::cout << RED << "[MESSAGE]   " << RESET << "<" << GREEN << user.getNickName() << RESET << "> " << RESET;
         }
         checkfd = user.getUserFd();
         std::cout << buffer;
 
-        clientInputCommand(user.getUserFd(), buffer);        
+        clientInputCommand(user.getUserFd(), buffer);     // commands recieved from client    
 
         
         if (buffer[bytes_read - 2] == '\r')
-            this->lastWritersfd_ = 0;
+            this->lastClientToWrite_ = 0;
         else      
-            this->lastWritersfd_ = checkfd;
+            this->lastClientToWrite_ = checkfd;
     }
 };
 
@@ -133,12 +120,16 @@ void Server::getClientMessage (int client_fd){
     } 
 };
 
+
+
+
+
 void Server::addNewClient(epoll_event &user_ev, int epfd) {
 
         //std::cout << "New client detected! Calling makeUser()" << std::endl;
         makeUser();
         if (SigHandler::sigloop == false)
-            return ;
+        return ;
         user_ev.events = EPOLLIN;
         user_ev.data.fd = users_.back()->user_pollfd.fd;
         epoll_ctl(epfd, EPOLL_CTL_ADD, users_.back()->user_pollfd.fd, &user_ev);
@@ -185,24 +176,13 @@ void Server::userLoopCheck() {
             }
         } 
 
-        runServerCommands();
+        runServerCommands(); // commands used for building and checking - to be deleted when finnished
     }
     close(epfd);
 }
 
 
 // Helper functions
-
-std::string Server::connectMessage(User *user) {
-    std::stringstream ss; 
-    std::string message =  putClientBanner() +"[SERVER]: Welcome ";
-    ss << user->getUserFd();
-    message += user->getNickName();
-    //message += "#" + ss.str();
-    message += "\n";
-    return (message);
-};
-
 
 User* Server::findUserByFd(int fd) {
     for (size_t i = 0; i < users_.size(); i++) {
@@ -242,7 +222,6 @@ std::string  Server::putClientBanner(void) {
     ss << "██║██╔══██╗██║         ██║     ██║     ██║██╔══╝  ██║╚██╗██║   ██║ \n";   
     ss << "██║██║  ██║╚██████╗    ╚██████╗███████╗██║███████╗██║ ╚████║   ██║ \n";
     ss << "══════════════════════════════════════════════════════════════════ \n";
-    ss << "connected on port: " << this->port_ << "\n";
 
     return (ss.str());
 };
@@ -251,11 +230,11 @@ std::string  Server::putClientBanner(void) {
 
 
 void Server::setWriterFd(int fd) {
-    this->lastWritersfd_ = fd;    
+    this->lastClientToWrite_ = fd;    
 };
 
 int Server::getWriterFd(void) {
-    return (this->lastWritersfd_);
+    return (this->lastClientToWrite_);
 };
    
    
