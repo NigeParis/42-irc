@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:08 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/17 16:23:35 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/17 17:09:41 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,8 @@ class Server {
         int cap(int clientFd, std::string input);
         int nick(int clientFd, std::string input);
         void clientQuits(int fd, User &user);
+        std::string trimUserName(std::string &userName);
+        std::string extractClientData(std::string &input, std::string strFind);
 
         
         void changeSpacesToDash(std::string &input);

@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/17 16:07:31 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/17 17:31:41 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,6 @@ void Server::makeUser(void) {
 }
 
 
-
 void Server::clientQuits(int fd, User &user) {
 
     std::vector<User*>::iterator it = std::find(users_.begin(), users_.end(), &user);
@@ -77,15 +76,10 @@ void Server::clientQuits(int fd, User &user) {
     delete &user;
     if (it != users_.end()) {
         users_.erase(it);
-        Server::timeStamp(); 
-        std::cout << YELLOW << "[CLIENTS]   " << RESET << users_.size() << std::endl;
+        Server::timeStamp();
+        std::cout << YELLOW << "[CLIENTS]   " << RESET << "<" << GREEN << "active" << RESET << "> " << users_.size() << std::endl;
     }            
 };
-
-
-
-
-
 
 
 void Server::readMessage(User &user) {
@@ -143,7 +137,7 @@ void Server::addNewClient(epoll_event &user_ev, int epfd) {
         user_ev.data.fd = users_.back()->user_pollfd.fd;
         epoll_ctl(epfd, EPOLL_CTL_ADD, users_.back()->user_pollfd.fd, &user_ev);
         Server::timeStamp(); 
-        std::cout << YELLOW << "[CLIENTS]   " << RESET << users_.size() << std::endl;
+        std::cout << YELLOW << "[CLIENTS]   " << RESET << "<" << GREEN << "active" << RESET << "> " << users_.size() << std::endl;
 };
 
 

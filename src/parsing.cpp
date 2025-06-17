@@ -6,40 +6,11 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 14:04:16 by nrobinso          #+#    #+#             */
-/*   Updated: 2025/06/17 16:24:54 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/17 17:35:12 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/parsing.hpp"
-
-
-std::string extractClientData(std::string &input, std::string strFind) {
-
-    std::string string;
-    
-    if (input.empty())
-        return ("");
-    std::size_t pos = input.find(strFind);
-    if (pos == input.npos)
-        return ("");
-    std::size_t pStart = input.find(" ", pos) + 1;
-    std::size_t pEnd = input.find('\r', pStart);
-    string = input.substr(pStart, pEnd - pStart);
-    return (string);
-}
-
-
-std::string trimUserName(std::string &userName) {
-
-    std::string trimmedString;
-
-    size_t pos = 0;
-    size_t end = userName.find(" ");
-    trimmedString = userName.substr(pos, end);
-    return(trimmedString);   
-}
-
-
 
 
 int Server::initClientsNames(int clientFd, std::string &inputClient) {
@@ -52,10 +23,7 @@ int Server::initClientsNames(int clientFd, std::string &inputClient) {
     std::string userName = extractClientData(inputClient, "USER ");
     if (initNames == false) {
         user->setNickName(nickName);
-        user->setUserPassword(userPassWord);
-        std::cout << GREEN << this->password_ << RESET  << BLUE <<userPassWord << RESET << std::endl;
-        
-        
+        user->setUserPassword(userPassWord);        
     }
     if ((userPassWord != this->password_) && (user->getValidPassword() == false)){
         user->setValidPassword(false);
@@ -65,14 +33,14 @@ int Server::initClientsNames(int clientFd, std::string &inputClient) {
 
         std::vector<User*>::iterator it = std::find(users_.begin(), users_.end(), user);
         Server::timeStamp(); 
-        std::cout << BLUE << "[LOGOUT]    " << RESET << "<" << GREEN << user->getNickName() << RESET << ">" << " Just left " << std::endl;
+        std::cout << BLUE << "[LOGOUT]    " << RESET << "<" << GREEN << user->getNickName() << RESET << ">" << " Just left incorrect password" << std::endl;
         this->lastClientToWrite_ = 0;  
         close(clientFd);
         delete user;
         if (it != users_.end()) {
             users_.erase(it);
             Server::timeStamp(); 
-            std::cout << YELLOW << "[CLIENTS]   " << RESET << users_.size() << std::endl;
+            std::cout << YELLOW << "[CLIENTS]   " << RESET << "<" << GREEN << "active" << RESET << "> " << users_.size() << std::endl;
         }            
         return (1) ;
     }
@@ -99,11 +67,6 @@ void Server::clientInputCommand(int clientFd, std::string &inputClient) {
     std::string nickName = extractClientData(inputClient, "NICK ");
     std::string passWord = extractClientData(inputClient, "PASS ");
     
-
-
-
-    
-    
     std::string welcomeMessage = "001 " + user->getNickName() + " :Welcome " + user->getNickName() + "\n" +  putClientBanner() + "\r\n";
 
     if (result == "PING") {
@@ -116,11 +79,10 @@ void Server::clientInputCommand(int clientFd, std::string &inputClient) {
     if (result == "NICK") {
         nick(clientFd, nickName);        
     }
-
-
     
 }; 
 
+///////////////////////////////// Commands //////////////////////////////////////////////
 
 
 void Server::pong(int clientFd, std::string input) {
@@ -146,10 +108,6 @@ int Server::cap(int clientFd, std::string input) {
 };
 
 
-
-
-
-
 int Server::nick(int clientFd, std::string input) {
     
     (void)clientFd;
@@ -172,7 +130,8 @@ int Server::nick(int clientFd, std::string input) {
 
 
 
-//Parsing tools
+//////////////////////////////////////// Parsing tools ////////////////////////////////////////
+
 
 void Server::changeSpacesToDash(std::string &input) {
 
@@ -181,3 +140,31 @@ void Server::changeSpacesToDash(std::string &input) {
             *it = '_';        
     }
 };
+
+
+std::string Server::trimUserName(std::string &userName) {
+
+    std::string trimmedString;
+
+    size_t pos = 0;
+    size_t end = userName.find(" ");
+    trimmedString = userName.substr(pos, end);
+    return(trimmedString);   
+}
+
+
+std::string Server::extractClientData(std::string &input, std::string strFind) {
+
+    std::string string;
+    
+    if (input.empty())
+        return ("");
+    std::size_t pos = input.find(strFind);
+    if (pos == input.npos)
+        return ("");
+    std::size_t pStart = input.find(" ", pos) + 1;
+    std::size_t pEnd = input.find('\r', pStart);
+    string = input.substr(pStart, pEnd - pStart);
+    return (string);
+}
+
