@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:08 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/16 20:31:04 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/17 09:41:19 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,15 +48,6 @@
 
 #define BUFFER 1024
 
-
-enum ServerCommands {
-
-    NOTICE,
-    EXIT    
-};
-
-
-
 class User;
 
 class Server {
@@ -77,31 +68,24 @@ class Server {
         void addNewClient(epoll_event &user_ev, int epfd);
         std::string  putClientBanner(void);
 
-
         void sendMessageAll(std::string message);
-        
-        void setWriterFd(int fd);
-        int getWriterFd(void);
-        
-      
+
+
         void timeStamp(void);
-
-
-
-
-        void pong(int socket, std::string message);
-        int cap(int socket, std::string message);
-
-
-        //parsing commands
-        void clientInputCommand (int socket, std::string &inputClient); 
         
+        
+        //parsing commands
+        void clientInputCommand (int clientFD, std::string &inputClient); 
+        void pong(int clientFd, std::string input);
+        int cap(int clientFd, std::string input);
+        int nick(int clientFd, std::string input);
+        
+        void initClientsNames(int clientFd,  std::string &inputClient);
 
         
         std::vector<User*> users_;
 
-        
-        private:
+    private:
         
         int port_;
         int socket_;

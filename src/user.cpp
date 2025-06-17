@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/06 11:07:49 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/16 09:45:11 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/17 09:27:52 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,10 @@ int User::getUserFd(void) {
 
 void User::setNickName(std::string &name) {
 
+    if (name != "guest") {
+        this->nickName_ = name;
+        return ;
+    }
     std::stringstream ss;
     ss << "#" << this->socketFd_;
     
@@ -49,9 +53,26 @@ void User::setNickName(std::string &name) {
 }
 
 
+
+
+
+
 std::string User::getNickName(void) {
     return (this->nickName_);
 };
+
+
+void User::setUserName(std::string &name) {
+    if(name.empty())
+        return ;
+    this->userName_ = name;
+};
+
+std::string User::getUserName(void) {
+    return (this->userName_);
+};
+
+
 
 
 bool User::getUserPassword(void) {
