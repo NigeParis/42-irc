@@ -6,13 +6,13 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/06 11:07:49 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/17 09:27:52 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/17 13:27:54 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/user.hpp"
 
-User::User(int fd, short events, short revents): nickName_("guest"), userName_("default"), userPassword_(false) {
+User::User(int fd, short events, short revents): nickName_("guest"), userName_("default"), userPassWord_(""), validPassword_(false) {
 
     this->socketFd_ = fd;
 
@@ -43,7 +43,7 @@ void User::setNickName(std::string &name) {
         return ;
     }
     std::stringstream ss;
-    ss << "#" << this->socketFd_;
+    ss << "_" << this->socketFd_;
     
     if (!name.empty()) {
         this->nickName_ = name + ss.str();
@@ -74,11 +74,22 @@ std::string User::getUserName(void) {
 
 
 
-
-bool User::getUserPassword(void) {
-    return (this->userPassword_);  
+bool User::getValidPassword(void) {
+    return (this->validPassword_);  
 };
 
-void User::setUserPassword(bool status) {
-    this->userPassword_ = status;
+void User::setValidPassword(bool status) {
+    this->validPassword_ = status;
+};
+
+
+
+
+
+std::string User::getUserPassword(void) {
+    return (this->userPassWord_);  
+};
+
+void User::setUserPassword(std::string password) {
+    this->userPassWord_ = password;
 };

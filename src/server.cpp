@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/16 20:23:35 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/17 16:07:31 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,13 +56,36 @@ void Server::makeUser(void) {
         return ;
     }
     fcntl(client_fd, F_SETFL, O_NONBLOCK);
-    User* user = new User(client_fd, POLLIN, 0);    
+    User* user = new User(client_fd, POLLIN, 0); 
     users_.push_back(user);
     std::string name = user->getNickName(); // default name
     user->setNickName(name);
     Server::timeStamp(); 
     std::cout << BLUE << "[LOGIN]     " << RESET << "<" << GREEN << user->getNickName() << RESET << ">" << " Just arrived " << std::endl;   
+
 }
+
+
+
+void Server::clientQuits(int fd, User &user) {
+
+    std::vector<User*>::iterator it = std::find(users_.begin(), users_.end(), &user);
+    Server::timeStamp(); 
+    std::cout << BLUE << "[LOGOUT]    " << RESET << "<" << GREEN << user.getNickName() << RESET << ">" << " Just left " << std::endl;
+    this->lastClientToWrite_ = 0;  
+    close(fd);
+    delete &user;
+    if (it != users_.end()) {
+        users_.erase(it);
+        Server::timeStamp(); 
+        std::cout << YELLOW << "[CLIENTS]   " << RESET << users_.size() << std::endl;
+    }            
+};
+
+
+
+
+
 
 
 void Server::readMessage(User &user) {
@@ -72,25 +95,15 @@ void Server::readMessage(User &user) {
     
     int fd = user.getUserFd();
     ssize_t bytes_read = recv(user.getUserFd(), &buffer[0], buffer.size() - 1, 0);
-    if (bytes_read == 0) {
-        std::vector<User*>::iterator it = std::find(users_.begin(), users_.end(), &user);
-        Server::timeStamp(); 
-        std::cout << BLUE << "[LOGOUT]    " << RESET << "<" << GREEN << user.getNickName() << RESET << ">" << " Just left " << std::endl;
-        this->lastClientToWrite_ = 0;  
-        close(fd);
-        delete &user;
-        if (it != users_.end()) {
-            users_.erase(it);
-            Server::timeStamp(); 
-            std::cout << YELLOW << "[CLIENTS]   " << RESET << users_.size() << std::endl;
-            return ;
-        }            
+    if ((bytes_read == 0) || SigHandler::sigloop == false) {
+        clientQuits(fd, user);
+        return ;
     }
     if (bytes_read == -1) {
         std::cout << "error recv()" << std::endl;
         return ;
     }
-    else if (buffer[0] == '\r')
+    if (buffer[0] == '\r')
         return;
     else if (bytes_read != -1) {
         if (bytes_read && lastClientToWrite_ != user.getUserFd() && buffer[0] != '\r') {
@@ -123,8 +136,9 @@ void Server::getClientMessage (int client_fd){
 void Server::addNewClient(epoll_event &user_ev, int epfd) {
 
         makeUser();
-        if (SigHandler::sigloop == false)
-        return ;
+        if (SigHandler::sigloop == false) 
+            return ;
+
         user_ev.events = EPOLLIN;
         user_ev.data.fd = users_.back()->user_pollfd.fd;
         epoll_ctl(epfd, EPOLL_CTL_ADD, users_.back()->user_pollfd.fd, &user_ev);

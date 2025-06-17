@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/05 15:01:27 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/17 06:53:04 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/17 12:36:35 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,11 @@ class User {
         std::string getNickName(void);
         void setUserName(std::string &name);
         std::string getUserName(void);
-        bool getUserPassword(void);
-        void setUserPassword(bool status);
+        std::string getUserPassword(void);
+        void setUserPassword(std::string password);
+        void setValidPassword(bool status);
+        bool getValidPassword(void);
+
 
         struct pollfd user_pollfd;
         
@@ -40,6 +43,7 @@ class User {
         int socketFd_;
         std::string nickName_;
         std::string userName_;
-        bool userPassword_;
+        std::string userPassWord_;
+        bool validPassword_;
     
 };

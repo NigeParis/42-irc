@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:08 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/17 09:41:19 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/17 16:23:35 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,8 +79,13 @@ class Server {
         void pong(int clientFd, std::string input);
         int cap(int clientFd, std::string input);
         int nick(int clientFd, std::string input);
+        void clientQuits(int fd, User &user);
+
         
-        void initClientsNames(int clientFd,  std::string &inputClient);
+        void changeSpacesToDash(std::string &input);
+        
+        
+        int initClientsNames(int clientFd,  std::string &inputClient);
 
         
         std::vector<User*> users_;
