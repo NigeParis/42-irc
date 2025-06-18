@@ -6,13 +6,13 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/06 11:07:49 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/18 14:56:52 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/18 17:21:26 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/user.hpp"
 
-User::User(int fd, short events, short revents): nickName_("guest"), userName_("default"), userPassWord_(""), validPassword_(false) {
+User::User(int fd, short events, short revents): nickName_("guest"), userName_("default"), userPassWord_(""), realName_(""), validPassword_(false) {
 
     this->socketFd_ = fd;
 
@@ -71,6 +71,20 @@ void User::setUserName(std::string &name) {
 std::string User::getUserName(void) {
     return (this->userName_);
 };
+
+
+
+void User::setRealName(std::string &name) {
+    if(name.empty())
+        return ;
+    this->realName_ = name;
+};
+
+std::string User::getRealName(void) {
+    return (this->realName_);
+};
+
+
 
 
 

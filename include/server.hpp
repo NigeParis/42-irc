@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:08 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/18 11:24:59 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/18 17:11:17 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,7 @@ class Server {
         std::string extractClientData(std::string &input, std::string strFind);
         int checkLeadingHash(int clientFd, std::string &input);
         void putErrorMessage(int clientFd, std::string &input, std::string errorMsg, int code);
+        std::string extractRealName(std::string &realName);
 
 
         

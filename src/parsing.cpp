@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 14:04:16 by nrobinso          #+#    #+#             */
-/*   Updated: 2025/06/18 16:53:22 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/18 17:23:21 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,10 @@ int Server::initClientsNames(int clientFd, std::string &inputClient) {
         user->setUserPassword(userPassWord); 
         std::string userName = extractClientData(inputClient, "USER ");
         userName = trimUserName(userName);
-        user->setUserName(userName);       
+        user->setUserName(userName); 
+        std::string realName = extractClientData(inputClient, "USER ");
+        realName = extractRealName(realName);
+        user->setRealName(realName);          
     }
     if ((userPassWord != this->password_) && (user->getValidPassword() == false)){
         user->setValidPassword(false);
@@ -52,6 +55,7 @@ int Server::initClientsNames(int clientFd, std::string &inputClient) {
     return (0);
 }
 
+
 // info 
 // PASS passWord
 // NICK nickName
@@ -71,6 +75,7 @@ void Server::clientInputCommand(int clientFd, std::string &inputClient) {
     if (initClientsNames(clientFd, inputClient))
         return ;
     std::string welcomeMessage = "001 " + user->getNickName() + " :Welcome " + user->getNickName() + "\n" +  putClientBanner() + "\r\n";
+   
 
     try
     {
@@ -264,4 +269,18 @@ std::string Server::extractClientData(std::string &input, std::string strFind) {
     string = input.substr(pStart, pEnd - pStart);
     return (string);
 }
+
+
+std::string Server::extractRealName(std::string &realName) {
+
+    std::string newString;
+    int pos;
+    int end = realName.size();
+
+    if (realName.empty())
+        return ("");
+    pos = realName.find(":") + 1;
+    newString = realName.substr(pos, end);
+    return (newString);  
+};
 
