@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 14:04:16 by nrobinso          #+#    #+#             */
-/*   Updated: 2025/06/18 17:23:21 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/18 18:48:24 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,9 +43,9 @@ int Server::initClientsNames(int clientFd, std::string &inputClient) {
         close(clientFd);
         delete user;
         if (it != users_.end()) {
-            users_.erase(it);
             Server::timeStamp(); 
             std::cout << YELLOW << "[CLIENTS]   " << RESET << "<" << GREEN << "active" << RESET << "> " << users_.size() << std::endl;
+            users_.erase(it);
         }            
         return (1) ;
     }

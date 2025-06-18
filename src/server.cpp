@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/18 12:07:06 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/18 18:54:57 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,9 +150,7 @@ void Server::addNewClient(epoll_event &user_ev, int epfd) {
     message = ":" + user->getNickName();
     message += " NICK guest";
     message += "\r\n";
-    Server::timeStamp(); 
     send(user->getUserFd(), message.c_str(), message.size(), 0);
-
 
 };
 
