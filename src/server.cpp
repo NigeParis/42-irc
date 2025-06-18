@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/17 17:31:41 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/18 12:07:06 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,21 +49,25 @@ void Server::makeUser(void) {
     struct sockaddr_in client_addr;
     socklen_t client_addr_len = sizeof(client_addr);
     
-    int client_fd = accept(socket_, (struct sockaddr *)&client_addr, &client_addr_len);
-    if (client_fd == -1) {
+    int clientFd = accept(socket_, (struct sockaddr *)&client_addr, &client_addr_len);
+    if (clientFd == -1) {
         std::cout << "Error: creating client FD" << std::endl;
         SigHandler::sigloop = false;
         return ;
     }
-    fcntl(client_fd, F_SETFL, O_NONBLOCK);
-    User* user = new User(client_fd, POLLIN, 0); 
+    fcntl(clientFd, F_SETFL, O_NONBLOCK);
+    User* user = new User(clientFd, POLLIN, 0); 
     users_.push_back(user);
     std::string name = user->getNickName(); // default name
-    user->setNickName(name);
+    user->setNickName(name);    
     Server::timeStamp(); 
     std::cout << BLUE << "[LOGIN]     " << RESET << "<" << GREEN << user->getNickName() << RESET << ">" << " Just arrived " << std::endl;   
 
 }
+
+
+
+   
 
 
 void Server::clientQuits(int fd, User &user) {
@@ -129,15 +133,27 @@ void Server::getClientMessage (int client_fd){
 
 void Server::addNewClient(epoll_event &user_ev, int epfd) {
 
-        makeUser();
-        if (SigHandler::sigloop == false) 
-            return ;
+    std::string message;
+    makeUser();
+    if (SigHandler::sigloop == false) 
+        return ;
 
-        user_ev.events = EPOLLIN;
-        user_ev.data.fd = users_.back()->user_pollfd.fd;
-        epoll_ctl(epfd, EPOLL_CTL_ADD, users_.back()->user_pollfd.fd, &user_ev);
-        Server::timeStamp(); 
-        std::cout << YELLOW << "[CLIENTS]   " << RESET << "<" << GREEN << "active" << RESET << "> " << users_.size() << std::endl;
+    user_ev.events = EPOLLIN;
+    user_ev.data.fd = users_.back()->user_pollfd.fd;
+    epoll_ctl(epfd, EPOLL_CTL_ADD, users_.back()->user_pollfd.fd, &user_ev);
+    Server::timeStamp(); 
+    std::cout << YELLOW << "[CLIENTS]   " << RESET << "<" << GREEN << "active" << RESET << "> " << users_.size() << std::endl;
+
+
+    User *user = findUserByFd(user_ev.data.fd);
+
+    message = ":" + user->getNickName();
+    message += " NICK guest";
+    message += "\r\n";
+    Server::timeStamp(); 
+    send(user->getUserFd(), message.c_str(), message.size(), 0);
+
+
 };
 
 

@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:08 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/17 17:09:41 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/18 11:24:59 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,10 +82,13 @@ class Server {
         void clientQuits(int fd, User &user);
         std::string trimUserName(std::string &userName);
         std::string extractClientData(std::string &input, std::string strFind);
+        int checkLeadingHash(int clientFd, std::string &input);
+        void putErrorMessage(int clientFd, std::string &input, std::string errorMsg, int code);
+
 
         
-        void changeSpacesToDash(std::string &input);
-        
+        int checkForSpaces(int clientFd, std::string &input);
+
         
         int initClientsNames(int clientFd,  std::string &inputClient);
 
