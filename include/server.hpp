@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:08 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/18 17:11:17 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/19 07:10:36 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@
 #define BUFFER 1024
 
 class User;
+class Channel;
 
 class Server {
 
@@ -95,6 +96,7 @@ class Server {
 
         
         std::vector<User*> users_;
+        std::vector<Channel*> channels_;
 
     private:
         

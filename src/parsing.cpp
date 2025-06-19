@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 14:04:16 by nrobinso          #+#    #+#             */
-/*   Updated: 2025/06/18 18:48:24 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/19 07:24:11 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -170,13 +170,13 @@ int Server::nick(int clientFd, std::string input) {
 int Server::checkForSpaces(int clientFd, std::string &input) {
 
     User *user = findUserByFd(clientFd);
-
+    
     if (input.empty()) {
         return (1);
     }
     for (std::string::iterator it = input.begin(); it < input.end(); it++) {
         if (*it == ' ') {
-            std::string errorMessage = "Error " +user->getNickName() + " " + input + " :Erroneus nickname";
+            std::string errorMessage = "Error " + user->getNickName() + " " + input + " :Erroneus nickname";
             Server::timeStamp(); 
             std::cout << RED << "[MESSAGE]   " << RESET << "<" << GREEN << user->getNickName() << RESET << "> ";
             std::cout << errorMessage << std::endl;

@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/18 18:54:57 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/19 07:13:18 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -204,6 +204,7 @@ User* Server::findUserByFd(int fd) {
     }
     return NULL;
 };
+
 
 
 void Server::putServerBanner(void) {

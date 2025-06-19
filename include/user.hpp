@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/05 15:01:27 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/18 17:20:33 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/19 07:23:55 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,9 @@
 #include <vector> 
 #include <sstream>
 #include "../include/server.hpp"
+#include "../include/channel.hpp"
+
+class Channel;
 
 class User {
 
@@ -39,6 +42,7 @@ class User {
 
 
         struct pollfd user_pollfd;
+        Channel *channel;
         
     private:
 
