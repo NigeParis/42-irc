@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 14:04:16 by nrobinso          #+#    #+#             */
-/*   Updated: 2025/06/19 12:11:30 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/19 13:17:22 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,25 +59,22 @@ int Server::initClientsNames(int clientFd, std::string &inputClient, User &user)
         
     user.setValidPassword(true);
  
-    //bool nameDoubleFlag = false;
+    // bool nameDoubleFlag = false;
     
     // if (initNames == true) {
-        
     //     for (size_t i = 0; i < users_.size(); i++) {
-        
-    //         if ((users_[i]->getNickName() == nickName) && nickName != "")  {
-    //             std::cout << BLUE << inputClient.substr(0,3) << RESET << std::endl;
-    //             putErrorMessage(clientFd, nickName, "Nickname is already in use", 433);
+    //         if (nickName != "")  {
     //             nameDoubleFlag = true;
     //         }
     //     }
-        
-    //     if (nickName != "" && nickName != user.getUserName() && nameDoubleFlag == false) {
-    //         nick(clientFd, nickName); 
-    //         //user.setUserName(nickName);
-    //     }       
-    //     //std::cout << BLUE << "[DEBUG] - inside initClientNames: " << userName << std::endl;
     // }
+    // std::cout << BLUE << "DOUBLE FOUND: " << nameDoubleFlag << nickName << RESET << std::endl;
+
+
+    //     if (nameDoubleFlag == false) {
+    //         nick(clientFd, nickName); 
+    //     }       
+    
     return (0);
 }
 
@@ -91,7 +88,6 @@ void Server::clientInputCommand(int clientFd, std::string &inputClient) {
 
     
     if (inputClient.empty()) return;
-
     
     User *user = findUserByFd(clientFd);
     size_t start = inputClient.find_first_not_of(" \t");
@@ -102,17 +98,22 @@ void Server::clientInputCommand(int clientFd, std::string &inputClient) {
         return ;
     std::string welcomeMessage = "001 " + user->getNickName() + " :Welcome " + user->getNickName() + "\n" +  putClientBanner() + "\r\n";
     //std::string userPassWord = extractClientData(inputClient, "PASS ");
-    // std::string userName = extractClientData(inputClient, "USER ");   
-    
+
     try
     {
         if (keyWordInput == "PING") {
             pong(clientFd, message);        
         }    
         else if (keyWordInput == "CAP") {
+            std::string nickName = extractClientData(inputClient, "NICK ");   
+            std::string userName = extractClientData(inputClient, "USER ");
+            userName = trimUserName(userName);
             if ((keyWordInput == "CAP") && inputClient.substr(4,2) == "LS") {
                 cap(clientFd, "CAP * LS :\r\n");
                 send(clientFd, welcomeMessage.c_str(), welcomeMessage.size(), 0); 
+
+                if (nickName != userName)
+                    nick(clientFd, nickName);
             }
         }
         else if (keyWordInput == "NICK") {
@@ -128,7 +129,7 @@ void Server::clientInputCommand(int clientFd, std::string &inputClient) {
                 }
             }
             
-            if (nickName != "" && nickName != user->getUserName() && nameDoubleFlag == false) {
+            if (nameDoubleFlag == false) {
                 nick(clientFd, nickName); 
                 //user.setUserName(nickName);
             }       
