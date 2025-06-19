@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:08 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/19 07:10:36 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/19 09:21:28 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ class Server {
         int checkForSpaces(int clientFd, std::string &input);
 
         
-        int initClientsNames(int clientFd,  std::string &inputClient);
+        int initClientsNames(int clientFd,  std::string &inputClient, User &user);
 
         
         std::vector<User*> users_;

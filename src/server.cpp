@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/19 07:44:58 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/19 09:37:18 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ void Server::makeUser(void) {
     std::string name = user->getNickName(); // default name
     user->setNickName(name);    
     Server::timeStamp(); 
-    std::cout << BLUE << "[LOGIN]     " << RESET << "<" << GREEN << user->getNickName() << RESET << ">" << " Just arrived " << std::endl;   
+    std::cout << BLUE << "[LOGIN]     " << RESET << "<" << GREEN << std::setfill(' ') << std::setw(8) << user->getNickName() << RESET << ">" << " Just arrived " << std::endl;   
 
 }
 
@@ -74,17 +74,16 @@ void Server::clientQuits(int fd, User &user) {
 
     std::vector<User*>::iterator it = std::find(users_.begin(), users_.end(), &user);
     Server::timeStamp(); 
-    std::cout << BLUE << "[LOGOUT]    " << RESET << "<" << GREEN << user.getNickName() << RESET << ">" << " Just left " << std::endl;
+    std::cout << BLUE << "[LOGOUT]    " << RESET << "<" << GREEN << std::setfill(' ') << std::setw(8)  << user.getNickName() << RESET << ">" << " Just left " << std::endl;
     this->lastClientToWrite_ = 0;  
     close(fd);
     delete &user;
     if (it != users_.end()) {
         users_.erase(it);
         Server::timeStamp();
-        std::cout << YELLOW << "[CLIENTS]   " << RESET << "<" << GREEN << "active" << RESET << "> " << users_.size() << std::endl;
+        std::cout << YELLOW << "[CLIENTS]   " << RESET << "<" << std::setfill(' ') << std::setw(7) << YELLOW  << "active"  << RESET << "> " << users_.size() << std::endl;
     }            
 };
-
 
 void Server::readMessage(User &user) {
 
@@ -142,17 +141,9 @@ void Server::addNewClient(epoll_event &user_ev, int epfd) {
     user_ev.data.fd = users_.back()->user_pollfd.fd;
     epoll_ctl(epfd, EPOLL_CTL_ADD, users_.back()->user_pollfd.fd, &user_ev);
     Server::timeStamp(); 
-    std::cout << YELLOW << "[CLIENTS]   " << RESET << "<" << GREEN << "active" << RESET << "> " << users_.size() << std::endl;
+    std::cout << YELLOW << "[CLIENTS]   " << RESET << "<" << std::setfill(' ') << std::setw(7) << YELLOW  << "active"  << RESET << "> " << users_.size() << std::endl;
 
-
-    // User *user = findUserByFd(user_ev.data.fd);
-
-    // message = ":" + user->getNickName();
-    // message += " NICK guest";
-    // message += "\r\n";
-    // std::cout << BLUE << message << RESET << std::endl;
-    // send(user->getUserFd(), message.c_str(), message.size(), 0);
-
+    
 };
 
 
@@ -265,6 +256,6 @@ void Server::timeStamp(void) {
     << std::setw(2) << localTime->tm_hour 
     << ":" 
     << std::setw(2) << localTime->tm_min 
-    << ":" << std::setw(2) 
-    << localTime->tm_sec << " ";
+    << ":" 
+    << std::setw(2) << localTime->tm_sec << " ";
 };

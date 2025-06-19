@@ -6,51 +6,73 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 14:04:16 by nrobinso          #+#    #+#             */
-/*   Updated: 2025/06/19 08:07:11 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/19 10:40:26 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/parsing.hpp"
 
 
-int Server::initClientsNames(int clientFd, std::string &inputClient) {
+int Server::initClientsNames(int clientFd, std::string &inputClient, User &user) {
 
     static bool initNames = false;
-
-    User *user = findUserByFd(clientFd);
+    bool nameDoubleFlag = false;
+    //User *user = findUserByFd(clientFd);
+    std::string realName = extractClientData(inputClient, "USER ");
+    realName = extractRealName(realName);
     std::string nickName = extractClientData(inputClient, "NICK ");
     std::string userPassWord = extractClientData(inputClient, "PASS ");
     std::string userName = extractClientData(inputClient, "USER ");
+    userName = trimUserName(userName);
+
+    if (initNames == true) {
+        
+    for (size_t i = 0; i < users_.size(); i++) {
+        
+        if (users_[i]->getNickName() == nickName) {
+            std::cout << BLUE << "[DEBUG] - found" << RESET << std::endl;
+            nameDoubleFlag = true;
+        }
+    }
+        
+        if (nickName != "" && nickName != user.getUserName() && nameDoubleFlag == false) {
+            nick(clientFd, nickName); 
+            //user.setUserName(nickName);
+        }       
+        //std::cout << BLUE << "[DEBUG] - inside initClientNames: " << userName << std::endl;
+    }
+    
+    //std::cout << BLUE << "[DEBUG] - userName: " << userName << " nickName: " << nickName << RESET << std::endl;
+    
     if (initNames == false) {
         nick(clientFd, nickName);        
-        user->setNickName(nickName);
-        user->setUserPassword(userPassWord); 
-        std::string userName = extractClientData(inputClient, "USER ");
-        userName = trimUserName(userName);
-        user->setUserName(userName); 
-        std::string realName = extractClientData(inputClient, "USER ");
-        realName = extractRealName(realName);
-        user->setRealName(realName);          
+        user.setNickName(nickName);
+        user.setUserPassword(userPassWord); 
+        user.setRealName(realName);
+        user.setUserName(userName);          
     }
-    if ((userPassWord != this->password_) && (user->getValidPassword() == false)){
-        user->setValidPassword(false);
-        std::vector<User*>::iterator it = std::find(users_.begin(), users_.end(), user);
-        std::string userName = user->getNickName();
+    if ((userPassWord != this->password_) && (user.getValidPassword() == false)){
+        user.setValidPassword(false);
+        //std::vector<User*>::iterator it = std::find(users_.begin(), users_.end(), user);
+        std::vector<User*>::iterator it = std::find(users_.begin(), users_.end(), &user);
+        
+        std::string userName = user.getNickName();
         putErrorMessage(clientFd, userName, "password incorrect", 464);
         Server::timeStamp(); 
-        std::cout << BLUE << "[LOGOUT]    " << RESET << "<" << GREEN << user->getNickName() << RESET << ">" << " exiting from the network" << std::endl;
+        std::cout << BLUE << "[LOGOUT]    " << RESET << "<" << GREEN  << YELLOW << std::setfill(' ') << user.getNickName()  << std::setw(8) << RESET << ">" << " exiting from the network" << std::endl;
         putErrorMessage(clientFd, userName, "connection failed", 464);
         this->lastClientToWrite_ = 0;  
         close(clientFd);
-        delete user;
+        delete &user;
         if (it != users_.end()) {
             Server::timeStamp(); 
-            std::cout << YELLOW << "[CLIENTS]   " << RESET << "<" << GREEN << "active" << RESET << "> " << users_.size() << std::endl;
+            //std::cout << YELLOW << "[CLIENTS]   " << RESET << "<" << std::setfill(' ') << std::setw(7) << YELLOW  << "active"  << RESET << "> " << users_.size() << std::endl;
             users_.erase(it);
         }            
+        std::cout << YELLOW << "[CLIENTS]   " << RESET << "<" << std::setfill(' ') << std::setw(7) << YELLOW  << "active"  << RESET << "> " << users_.size() << std::endl;
         return (1) ;
     }
-    user->setValidPassword(true);
+    user.setValidPassword(true);
     initNames = true;
     return (0);
 }
@@ -72,7 +94,7 @@ void Server::clientInputCommand(int clientFd, std::string &inputClient) {
     size_t end = inputClient.find_first_of(" \t");
     std::string keyWordInput = inputClient.substr(start, end - start);    
     std::string message = inputClient.substr(end - start + 1, inputClient.size()); 
-    if (initClientsNames(clientFd, inputClient))
+    if (initClientsNames(clientFd, inputClient, *user))
         return ;
     std::string welcomeMessage = "001 " + user->getNickName() + " :Welcome " + user->getNickName() + "\n" +  putClientBanner() + "\r\n";
     //std::string userPassWord = extractClientData(inputClient, "PASS ");
@@ -91,7 +113,7 @@ void Server::clientInputCommand(int clientFd, std::string &inputClient) {
         }        
         else if (keyWordInput == "NICK") {
             std::string nickName = extractClientData(inputClient, "NICK ");
-            std::cout << BLUE << nickName << RESET << std::endl; 
+            //std::cout << BLUE << "[DEBUG] - nickName: " << nickName << RESET << std::endl; 
             nick(clientFd, nickName);        
         }
         else if (keyWordInput == "MODE") {
@@ -102,7 +124,7 @@ void Server::clientInputCommand(int clientFd, std::string &inputClient) {
             clientQuits(clientFd, *user);
         }
         else {
-            std::cout << BLUE << keyWordInput << RESET << std::endl;
+            //std::cout << "[DEBUG] - CMD recieved: " << BLUE << keyWordInput << RESET << std::endl;
             throw std::runtime_error("ERROR :No existing command\n");
         }
     }
@@ -152,11 +174,13 @@ int Server::nick(int clientFd, std::string input) {
         return (1);
     if (checkForSpaces(clientFd, input))
         return (1);
+    if (input == user->getNickName())
+        return (0);
     message = ":" + user->getNickName();
     message += " NICK " + input;
     message += "\r\n";
     Server::timeStamp(); 
-    std::cout << RED << "[MESSAGE]   " << RESET << "<" << GREEN << user->getNickName() << RESET << "> ";
+    std::cout << RED << "[MESSAGE]   " << RESET << "<" << GREEN << std::setfill(' ') << std::setw(8) << user->getNickName() << RESET << "> ";
     std::cout << "Changed nickname to " << "<" << GREEN << input << RESET << ">" << std::endl;
     user->setNickName(input);
     send(clientFd, message.c_str(), message.size(), 0);
