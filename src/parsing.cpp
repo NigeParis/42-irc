@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 14:04:16 by nrobinso          #+#    #+#             */
-/*   Updated: 2025/06/19 13:17:22 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/19 13:46:34 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ int Server::initClientsNames(int clientFd, std::string &inputClient, User &user)
         std::string userName = user.getNickName();
         putErrorMessage(clientFd, userName, "password incorrect", 464);
         Server::timeStamp(); 
-        std::cout << BLUE << "[LOGOUT]    " << RESET << "<" << GREEN  << YELLOW << std::setfill(' ') << user.getNickName()  << std::setw(8) << RESET << ">" << " exiting from the network" << std::endl;
+        std::cout << BLUE << "[LOGOUT]    " << RESET << "<" << GREEN << std::setfill(' ') << std::setw(8)  << user.getNickName() << RESET << ">" << " Just left " << std::endl;
         putErrorMessage(clientFd, userName, "connection failed", 464);
         this->lastClientToWrite_ = 0;  
         close(clientFd);
@@ -112,8 +112,21 @@ void Server::clientInputCommand(int clientFd, std::string &inputClient) {
                 cap(clientFd, "CAP * LS :\r\n");
                 send(clientFd, welcomeMessage.c_str(), welcomeMessage.size(), 0); 
 
-                if (nickName != userName)
-                    nick(clientFd, nickName);
+            bool nameDoubleFlag = false;
+        
+            for (size_t i = 0; i < users_.size(); i++) {
+        
+                if ((users_[i]->getNickName() == nickName) && nickName != "")  {
+                    std::cout << BLUE << "DOUBLE FOUND !" << RESET << std::endl;
+                    nameDoubleFlag = true;
+                }
+            }
+            
+                if (nameDoubleFlag == false) {
+                    nick(clientFd, nickName); 
+                //user.setUserName(nickName);
+                }       
+        
             }
         }
         else if (keyWordInput == "NICK") {
@@ -140,6 +153,9 @@ void Server::clientInputCommand(int clientFd, std::string &inputClient) {
         }
         else if (keyWordInput == "QUIT") {
             clientQuits(clientFd, *user);
+        }
+        else if (keyWordInput == "WHOIS") {
+            std::cout << BLUE << "[DEBUG] - WHOIS CMD RECIEVED" << RESET << std::endl;
         }
         else {
             //std::cout << "[DEBUG] - CMD recieved: " << BLUE << keyWordInput << RESET << std::endl;
