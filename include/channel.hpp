@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/19 06:44:33 by nrobinso          #+#    #+#             */
-/*   Updated: 2025/06/19 07:22:34 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/19 07:27:50 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,11 @@ class Channel {
         std::string getChannelName(void);
         void setChannelName(std::string name);
 
+        std::string getChannelPassword(void);
+        void setChannelPassword(std::string name);
+
+        std::string getChannelTopic(void);
+        void setChannelTopic(std::string name);
 
     private:
 

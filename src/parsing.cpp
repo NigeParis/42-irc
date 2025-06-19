@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 14:04:16 by nrobinso          #+#    #+#             */
-/*   Updated: 2025/06/19 07:24:11 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/19 08:07:11 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ int Server::initClientsNames(int clientFd, std::string &inputClient) {
     std::string userPassWord = extractClientData(inputClient, "PASS ");
     std::string userName = extractClientData(inputClient, "USER ");
     if (initNames == false) {
+        nick(clientFd, nickName);        
         user->setNickName(nickName);
         user->setUserPassword(userPassWord); 
         std::string userName = extractClientData(inputClient, "USER ");
@@ -51,7 +52,6 @@ int Server::initClientsNames(int clientFd, std::string &inputClient) {
     }
     user->setValidPassword(true);
     initNames = true;
-
     return (0);
 }
 
@@ -75,8 +75,9 @@ void Server::clientInputCommand(int clientFd, std::string &inputClient) {
     if (initClientsNames(clientFd, inputClient))
         return ;
     std::string welcomeMessage = "001 " + user->getNickName() + " :Welcome " + user->getNickName() + "\n" +  putClientBanner() + "\r\n";
-   
-
+    //std::string userPassWord = extractClientData(inputClient, "PASS ");
+    // std::string userName = extractClientData(inputClient, "USER ");   
+    
     try
     {
         if (keyWordInput == "PING") {
@@ -89,14 +90,16 @@ void Server::clientInputCommand(int clientFd, std::string &inputClient) {
             }
         }        
         else if (keyWordInput == "NICK") {
-            nick(clientFd, user->getNickName());        
+            std::string nickName = extractClientData(inputClient, "NICK ");
+            std::cout << BLUE << nickName << RESET << std::endl; 
+            nick(clientFd, nickName);        
         }
         else if (keyWordInput == "MODE") {
             
             std::cout << RED "inside MODE" << RESET << std::endl;
         }
         else if (keyWordInput == "QUIT") {
-                    clientQuits(clientFd, *user);
+            clientQuits(clientFd, *user);
         }
         else {
             std::cout << BLUE << keyWordInput << RESET << std::endl;
@@ -149,7 +152,6 @@ int Server::nick(int clientFd, std::string input) {
         return (1);
     if (checkForSpaces(clientFd, input))
         return (1);
-    
     message = ":" + user->getNickName();
     message += " NICK " + input;
     message += "\r\n";

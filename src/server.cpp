@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/19 07:13:18 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/19 07:44:58 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,12 +145,13 @@ void Server::addNewClient(epoll_event &user_ev, int epfd) {
     std::cout << YELLOW << "[CLIENTS]   " << RESET << "<" << GREEN << "active" << RESET << "> " << users_.size() << std::endl;
 
 
-    User *user = findUserByFd(user_ev.data.fd);
+    // User *user = findUserByFd(user_ev.data.fd);
 
-    message = ":" + user->getNickName();
-    message += " NICK guest";
-    message += "\r\n";
-    send(user->getUserFd(), message.c_str(), message.size(), 0);
+    // message = ":" + user->getNickName();
+    // message += " NICK guest";
+    // message += "\r\n";
+    // std::cout << BLUE << message << RESET << std::endl;
+    // send(user->getUserFd(), message.c_str(), message.size(), 0);
 
 };
 
