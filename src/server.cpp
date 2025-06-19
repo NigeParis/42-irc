@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/19 09:37:18 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/19 10:47:09 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,7 @@ void Server::readMessage(User &user) {
     else if (bytes_read != -1) {
         if (bytes_read && lastClientToWrite_ != user.getUserFd() && buffer[0] != '\r') {
             Server::timeStamp(); 
-            std::cout << RED << "[MESSAGE]   " << RESET << "<" << GREEN << user.getNickName() << RESET << "> " << RESET;
+            std::cout << RED << "[MESSAGE]   " << RESET << "<" << GREEN << std::setfill(' ') << std::setw(8) << user.getNickName() << RESET << "> ";
         }
         checkfd = user.getUserFd();
         std::cout << buffer;
