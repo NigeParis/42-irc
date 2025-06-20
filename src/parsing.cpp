@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 14:04:16 by nrobinso          #+#    #+#             */
-/*   Updated: 2025/06/20 13:41:59 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/20 17:09:19 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,8 @@ void Server::clientInputCommand(int clientFd, std::string &inputClient) {
     keyWordIn = getKeyWord(inputClient, start, end);
     std::string message = inputClient.substr(end - start + 1, inputClient.size()); 
     if (initClientsNames(clientFd, inputClient, *user)) return ;
-    
+    std::string testmessage;
+
     try {
         switch (keyWordIn.value) {
             case PING:
@@ -78,8 +79,11 @@ void Server::clientInputCommand(int clientFd, std::string &inputClient) {
                 break;
             }
             case NICK: {
-
-                nick(clientFd, inputClient, user);
+                std::cout << BLUE << "[DEBUG] - case: NICK" << RESET << std::endl;
+                testmessage = ":" + user->getNickName() + "!nrobinso@localhost NICK #coucou\r\n";
+                std::cout << testmessage << std::endl;
+                send(clientFd, testmessage.c_str(), testmessage.size(), 0);      
+                // nick(clientFd, inputClient, user);
                 break;
             }
             case MODE:
@@ -117,7 +121,12 @@ void Server::clientInputCommand(int clientFd, std::string &inputClient) {
             case INVITE:
                 std::cout << BLUE << "[DEBUG] - case: INVITE" << RESET << std::endl;
                 break;
-                
+            case PART:
+                std::cout << BLUE << "[DEBUG] - case: PART" << RESET << std::endl;
+                testmessage = ":" + user->getNickName() + "!nrobinso@localhost PART #test\r\n";
+                std::cout << testmessage << std::endl;
+                send(clientFd, testmessage.c_str(), testmessage.size(), 0);       
+                break;  
             case KICK:
                 std::cout << BLUE << "[DEBUG] - case: KICK" << RESET << std::endl;
                 break;
@@ -132,7 +141,6 @@ void Server::clientInputCommand(int clientFd, std::string &inputClient) {
 }; 
 
 
-///////////////////////////////// Commands //////////////////////////////////////////////
 
 int Server::sendCommand(int clientFd, std::string commandToBeSent) {
 
@@ -346,6 +354,9 @@ keyWordInput getKeyWord(std::string &inputClient, size_t start, size_t end) {
     }        
     else if (keyWordInput == "PASS") {
         keyWord.value = PASS;        
+    }
+    else if (keyWordInput == "PART") {
+        keyWord.value = PART;        
     }
     else if (keyWordInput == "INVITE") {
         keyWord.value = INVITE;        

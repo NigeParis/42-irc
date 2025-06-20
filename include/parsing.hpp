@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 14:02:07 by nrobinso          #+#    #+#             */
-/*   Updated: 2025/06/20 13:37:33 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/20 15:48:46 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,8 @@ enum keyWord {
     TOPIC,
     INVITE,
     KICK,
-    ERROR
+    ERROR,
+    PART    
 };
 
 struct keyWordInput {
