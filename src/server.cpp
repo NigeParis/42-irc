@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/19 10:47:09 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/20 11:26:04 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -235,14 +235,14 @@ std::string  Server::putClientBanner(void) {
 void Server::sendMessage(User &user, std::string message) {
 
     if (user.getUserFd() > -1 && !message.empty())
-        send(user.getUserFd(), message.c_str(), message.size(), 0);
+        sendCommand(user.getUserFd(), message);
 };
 
 
 void Server::sendMessageAll(std::string message) {
 
     for (size_t i = 0;  i < users_.size(); i++)
-        send(users_[i]->getUserFd(), message.c_str(), message.size(), 0);
+        sendCommand(users_[i]->getUserFd(), message);
 };
 
 

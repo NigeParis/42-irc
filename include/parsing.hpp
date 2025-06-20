@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 14:02:07 by nrobinso          #+#    #+#             */
-/*   Updated: 2025/06/20 11:04:51 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/20 11:15:52 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ enum keyWord {
 };
 
 struct keyWordInput {
-
     keyWord value;  
 };
 

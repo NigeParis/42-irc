@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 14:04:16 by nrobinso          #+#    #+#             */
-/*   Updated: 2025/06/20 11:08:46 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/20 11:33:04 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,6 @@ int Server::initClientsNames(int clientFd, std::string &inputClient, User &user)
     }
     if ((userPassWord != this->password_) && (user.getValidPassword() == false)){
         user.setValidPassword(false);
-        //std::vector<User*>::iterator it = std::find(users_.begin(), users_.end(), user);
         std::vector<User*>::iterator it = std::find(users_.begin(), users_.end(), &user);
         
         std::string userName = user.getNickName();
@@ -50,7 +49,6 @@ int Server::initClientsNames(int clientFd, std::string &inputClient, User &user)
         delete &user;
         if (it != users_.end()) {
             Server::timeStamp(); 
-            //std::cout << YELLOW << "[CLIENTS]   " << RESET << "<" << std::setfill(' ') << std::setw(7) << YELLOW  << "active"  << RESET << "> " << users_.size() << std::endl;
             users_.erase(it);
         }            
         std::cout << YELLOW << "[CLIENTS]   " << RESET << "<" << std::setfill(' ') << std::setw(7) << YELLOW  << "active"  << RESET << "> " << users_.size() << std::endl;
@@ -91,7 +89,7 @@ void Server::clientInputCommand(int clientFd, std::string &inputClient) {
                 break;
             }
             case MODE:
-                //std::cout << RED << "inside MODE" << RESET << std::endl;
+                std::cout << BLUE << "[DEBUG] - case: MODE" << RESET << std::endl;
                 break;
 
             case QUIT:
@@ -99,7 +97,7 @@ void Server::clientInputCommand(int clientFd, std::string &inputClient) {
                 break;
 
             case WHOIS:
-                //std::cout << BLUE << "[DEBUG] - WHOIS CMD RECIEVED" << RESET << std::endl;
+                std::cout << BLUE << "[DEBUG] - case: WHOIS" << RESET << std::endl;
                 break;
 
             case ERROR:
@@ -107,7 +105,7 @@ void Server::clientInputCommand(int clientFd, std::string &inputClient) {
         }
     }
     catch (const std::exception& e) {
-        send(clientFd, e.what(), strlen(e.what()), 0);
+        sendCommand(clientFd, e.what());
     }
 
 
@@ -149,7 +147,7 @@ void Server::cap(int clientFd, std::string &inputClient, User *user) {
         sendCommand(clientFd, welcomeMessage);
         for (size_t i = 0; i < users_.size(); ++i) {
             if ((users_[i]->getNickName() == nickName) && !nickName.empty()) {
-                std::cout << BLUE << "DOUBLE FOUND !" << RESET << std::endl;
+                //std::cout << BLUE << "DOUBLE FOUND !" << RESET << std::endl;
                 nameDoubleFlag = true;
             }
         }
@@ -169,7 +167,7 @@ void Server::nick(int clientFd, std::string &inputClient, User *user) {
 
     for (size_t i = 0; i < users_.size(); ++i) {
         if ((users_[i]->getNickName() == nickName) && !nickName.empty()) {
-            std::cout << BLUE << "DOUBLE FOUND !" << RESET << std::endl;
+            //std::cout << BLUE << "DOUBLE FOUND !" << RESET << std::endl;
             putErrorMessage(clientFd, nickName, "Nickname is already in use", 433);
             nameDoubleFlag = true;
         }
@@ -222,7 +220,7 @@ int Server::checkForSpaces(int clientFd, std::string &input) {
             std::cout << RED << "[MESSAGE]   " << RESET << "<" << GREEN << std::setfill(' ') << std::setw(8) << user->getNickName() << RESET << "> ";
             std::cout << errorMessage << std::endl;
             errorMessage += "\r\n";    //commande ended signal
-            send(clientFd, errorMessage.c_str(), errorMessage.size(), 0);
+            sendCommand(clientFd, errorMessage);
             return (1); 
         }      
     }
@@ -241,7 +239,7 @@ void Server::putErrorMessage(int clientFd, std::string &nick, std::string errorM
         std::cout << RED << "[MESSAGE]   " << RESET << "<" << GREEN << std::setfill(' ') << std::setw(8) << user->getNickName() << RESET << "> ";
         std::cout << errorMessage << std::endl;
         errorMessage += "\r\n";    //commande ended signal
-        send(clientFd, errorMessage.c_str(), errorMessage.size(), 0);
+        sendCommand(clientFd, errorMessage);
     }
     
     // "<client> <nick> :Erroneus nickname"
@@ -251,7 +249,7 @@ void Server::putErrorMessage(int clientFd, std::string &nick, std::string errorM
         std::cout << RED << "[MESSAGE]   " << RESET << "<" << GREEN << std::setfill(' ') << std::setw(8) << user->getNickName() << RESET << "> ";
         std::cout << errorMessage << std::endl;
         errorMessage += "\r\n";   //commande ended signal
-        send(clientFd, errorMessage.c_str(), errorMessage.size(), 0);
+        sendCommand(clientFd, errorMessage);
     }    
 
     // RPL_ENDOFWHOIS (318) 
@@ -261,10 +259,21 @@ void Server::putErrorMessage(int clientFd, std::string &nick, std::string errorM
         std::string requesterNick = user->getNickName();  // the one who issued /WHOIS
         std::string messageText = ":localhost 318 " + requesterNick + " " + targetNick + " :End of /WHOIS list";        
         messageText += "\r\n";
-        send(clientFd, messageText.c_str(), messageText.size(), 0);
+        sendCommand(clientFd, messageText);
     }
 };
 
+std::string Server::putWelcomeMessage(User *user) {
+
+    std::string welcomeMessage = "001 " 
+                                + user->getNickName() 
+                                + " :Welcome " 
+                                + user->getNickName() 
+                                + "\n" 
+                                +  putClientBanner() 
+                                + "\r\n";
+    return (welcomeMessage);
+};
 
 
 
@@ -323,20 +332,6 @@ std::string Server::extractRealName(std::string &realName) {
     pos = realName.find(":") + 1;
     newString = realName.substr(pos, end);
     return (newString);  
-};
-
-
-
-std::string Server::putWelcomeMessage(User *user) {
-
-    std::string welcomeMessage = "001 " 
-                                + user->getNickName() 
-                                + " :Welcome " 
-                                + user->getNickName() 
-                                + "\n" 
-                                +  putClientBanner() 
-                                + "\r\n";
-    return (welcomeMessage);
 };
 
 
