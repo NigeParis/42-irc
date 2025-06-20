@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:08 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/19 09:21:28 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/20 10:58:01 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,14 +78,20 @@ class Server {
         //parsing commands
         void clientInputCommand (int clientFD, std::string &inputClient); 
         void pong(int clientFd, std::string input);
-        int cap(int clientFd, std::string input);
-        int nick(int clientFd, std::string input);
         void clientQuits(int fd, User &user);
         std::string trimUserName(std::string &userName);
         std::string extractClientData(std::string &input, std::string strFind);
         int checkLeadingHash(int clientFd, std::string &input);
         void putErrorMessage(int clientFd, std::string &input, std::string errorMsg, int code);
         std::string extractRealName(std::string &realName);
+        std::string putWelcomeMessage(User *user);
+        
+        void cap(int clientFd, std::string &inputClient, User *user);
+        int sendCommand(int clientFd, std::string input);
+        
+        void nick(int clientFd, std::string &inputClient, User *user);
+        int nickCommand(int clientFd, std::string input);
+
 
 
         
