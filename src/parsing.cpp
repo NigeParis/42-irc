@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 14:04:16 by nrobinso          #+#    #+#             */
-/*   Updated: 2025/06/20 11:33:04 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/20 11:37:58 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,16 +16,13 @@
 int Server::initClientsNames(int clientFd, std::string &inputClient, User &user) {
 
     static bool initNames = false;
-    //User *user = findUserByFd(clientFd);
     std::string realName = extractClientData(inputClient, "USER ");
     realName = extractRealName(realName);
     std::string nickName = extractClientData(inputClient, "NICK ");
     std::string userPassWord = extractClientData(inputClient, "PASS ");
     std::string userName = extractClientData(inputClient, "USER ");
     userName = trimUserName(userName);
-
-
-        //std::cout << BLUE << "[DEBUG] - userName: " << userName << " nickName: " << nickName << RESET << std::endl;
+    //std::cout << BLUE << "[DEBUG] - userName: " << userName << " nickName: " << nickName << RESET << std::endl;
     
     if (initNames == false) {
         nickCommand(clientFd, nickName);        
@@ -38,7 +35,6 @@ int Server::initClientsNames(int clientFd, std::string &inputClient, User &user)
     if ((userPassWord != this->password_) && (user.getValidPassword() == false)){
         user.setValidPassword(false);
         std::vector<User*>::iterator it = std::find(users_.begin(), users_.end(), &user);
-        
         std::string userName = user.getNickName();
         putErrorMessage(clientFd, userName, "password incorrect", 464);
         Server::timeStamp(); 
@@ -62,10 +58,8 @@ int Server::initClientsNames(int clientFd, std::string &inputClient, User &user)
 void Server::clientInputCommand(int clientFd, std::string &inputClient) {
 
     keyWordInput keyWordIn;
-
     
     if (inputClient.empty()) return;
-    
     User *user = findUserByFd(clientFd);
     size_t start = inputClient.find_first_not_of(" \t");
     size_t end = inputClient.find_first_of(" \t");
@@ -107,9 +101,6 @@ void Server::clientInputCommand(int clientFd, std::string &inputClient) {
     catch (const std::exception& e) {
         sendCommand(clientFd, e.what());
     }
-
-
-    
 }; 
 
 ///////////////////////////////// Commands //////////////////////////////////////////////
@@ -228,6 +219,99 @@ int Server::checkForSpaces(int clientFd, std::string &input) {
 };
 
 
+
+
+// Checks for leading #nick - interdiction error (432)
+//ERR_ERRONEUSNICKNAME (432)
+
+int Server::checkLeadingHash(int clientFd, std::string &input) {
+    
+    if (input.empty()) {
+        putErrorMessage(clientFd, input, " :No nickname given", 431);        
+        return (1);
+    }
+    if ((*input.begin() == '#') || (*input.begin() == ':')) {
+        putErrorMessage(clientFd, input, " :Erroneus nickname", 432);
+        return(1);
+    }
+    return (0);
+};
+
+
+std::string Server::trimUserName(std::string &userName) {
+    
+    std::string trimmedString;
+    
+    size_t pos = 0;
+    size_t end = userName.find(" ");
+    trimmedString = userName.substr(pos, end);
+    return(trimmedString);   
+}
+
+
+std::string Server::extractClientData(std::string &input, std::string strFind) {
+    
+    std::string string;
+    
+    if (input.empty())
+    return ("");
+    std::size_t pos = input.find(strFind);
+    if (pos == input.npos)
+    return ("");
+    std::size_t pStart = input.find(" ", pos) + 1;
+    std::size_t pEnd = input.find('\r', pStart);
+    string = input.substr(pStart, pEnd - pStart);
+    return (string);
+}
+
+
+std::string Server::extractRealName(std::string &realName) {
+    
+    std::string newString;
+    int pos;
+    int end = realName.size();
+    
+    if (realName.empty())
+    return ("");
+    pos = realName.find(":") + 1;
+    newString = realName.substr(pos, end);
+    return (newString);  
+};
+
+
+keyWordInput getKeyWord(std::string &inputClient, size_t start, size_t end) {
+    
+    keyWordInput keyWord;
+    
+    std::string keyWordInput = inputClient.substr(start, end - start);    
+    
+    if (keyWordInput == "PING") {
+        keyWord.value = PING;        
+    }
+    else if (keyWordInput == "CAP") {
+        keyWord.value = CAP;        
+    }
+    else if (keyWordInput == "NICK") {
+        keyWord.value = NICK;        
+    }
+    else if (keyWordInput == "MODE") {
+        keyWord.value = MODE;        
+    }
+    else if (keyWordInput == "QUIT") {
+        keyWord.value = QUIT;        
+    }
+    else if (keyWordInput == "WHOIS") {
+        keyWord.value = WHOIS;        
+    }
+    else
+    keyWord.value = ERROR;        
+    
+    return (keyWord);
+}
+
+/////////////////////////// output Display Functions ////////////////////////////////////////////////
+
+
 void Server::putErrorMessage(int clientFd, std::string &nick, std::string errorMsg, int code) {
 
     User *user = findUserByFd(clientFd);
@@ -274,93 +358,3 @@ std::string Server::putWelcomeMessage(User *user) {
                                 + "\r\n";
     return (welcomeMessage);
 };
-
-
-
-// Checks for leading #nick - interdiction error (432)
-//ERR_ERRONEUSNICKNAME (432)
-
-int Server::checkLeadingHash(int clientFd, std::string &input) {
-
-    if (input.empty()) {
-        putErrorMessage(clientFd, input, " :No nickname given", 431);        
-        return (1);
-    }
-    if ((*input.begin() == '#') || (*input.begin() == ':')) {
-        putErrorMessage(clientFd, input, " :Erroneus nickname", 432);
-        return(1);
-    }
-    return (0);
-};
-
-
-std::string Server::trimUserName(std::string &userName) {
-
-    std::string trimmedString;
-
-    size_t pos = 0;
-    size_t end = userName.find(" ");
-    trimmedString = userName.substr(pos, end);
-    return(trimmedString);   
-}
-
-
-std::string Server::extractClientData(std::string &input, std::string strFind) {
-
-    std::string string;
-    
-    if (input.empty())
-        return ("");
-    std::size_t pos = input.find(strFind);
-    if (pos == input.npos)
-        return ("");
-    std::size_t pStart = input.find(" ", pos) + 1;
-    std::size_t pEnd = input.find('\r', pStart);
-    string = input.substr(pStart, pEnd - pStart);
-    return (string);
-}
-
-
-std::string Server::extractRealName(std::string &realName) {
-
-    std::string newString;
-    int pos;
-    int end = realName.size();
-
-    if (realName.empty())
-        return ("");
-    pos = realName.find(":") + 1;
-    newString = realName.substr(pos, end);
-    return (newString);  
-};
-
-
-keyWordInput getKeyWord(std::string &inputClient, size_t start, size_t end) {
-
-    keyWordInput keyWord;
-
-    std::string keyWordInput = inputClient.substr(start, end - start);    
-    
-    if (keyWordInput == "PING") {
-        keyWord.value = PING;        
-    }
-    else if (keyWordInput == "CAP") {
-        keyWord.value = CAP;        
-    }
-    else if (keyWordInput == "NICK") {
-        keyWord.value = NICK;        
-    }
-    else if (keyWordInput == "MODE") {
-        keyWord.value = MODE;        
-    }
-    else if (keyWordInput == "QUIT") {
-        keyWord.value = QUIT;        
-    }
-    else if (keyWordInput == "WHOIS") {
-        keyWord.value = WHOIS;        
-    }
-    else
-        keyWord.value = ERROR;        
-    
-    return (keyWord);
-}
