@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/20 11:26:04 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/20 13:11:29 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,8 +110,8 @@ void Server::readMessage(User &user) {
         checkfd = user.getUserFd();
         std::cout << buffer;
 
-        clientInputCommand(user.getUserFd(), buffer);     // commands recieved from client    
-
+        clientInputCommand(user.getUserFd(), buffer);     // commands recieved from client  
+        
         
         if (buffer[bytes_read - 2] == '\r')
             this->lastClientToWrite_ = 0;

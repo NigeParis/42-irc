@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 14:02:07 by nrobinso          #+#    #+#             */
-/*   Updated: 2025/06/20 11:15:52 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/20 13:37:33 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,13 @@ enum keyWord {
     MODE,
     QUIT,
     WHOIS,
+    JOIN,
+    PRIVMSG,
+    USER,
+    PASS,
+    TOPIC,
+    INVITE,
+    KICK,
     ERROR
 };
 
@@ -33,4 +40,3 @@ struct keyWordInput {
 };
 
 keyWordInput getKeyWord(std::string &inputClient, size_t start, size_t end);
-

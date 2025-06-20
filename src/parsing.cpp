@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 14:04:16 by nrobinso          #+#    #+#             */
-/*   Updated: 2025/06/20 11:37:58 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/20 13:41:59 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,10 +90,38 @@ void Server::clientInputCommand(int clientFd, std::string &inputClient) {
                 clientQuits(clientFd, *user);
                 break;
 
+            case JOIN:
+                std::cout << BLUE << "[DEBUG] - case: JOIN" << RESET << std::endl;
+                break;
+
             case WHOIS:
                 std::cout << BLUE << "[DEBUG] - case: WHOIS" << RESET << std::endl;
                 break;
 
+            case PRIVMSG:
+                std::cout << BLUE << "[DEBUG] - case: PRIVMSG" << RESET << std::endl;
+                break;
+                
+            case USER:
+                std::cout << BLUE << "[DEBUG] - case: USER" << RESET << std::endl;
+                break;
+
+            case TOPIC:
+                std::cout << BLUE << "[DEBUG] - case: TOPIC" << RESET << std::endl;
+                break;
+
+            case PASS:
+                std::cout << BLUE << "[DEBUG] - case: PASS" << RESET << std::endl;
+                break;
+
+            case INVITE:
+                std::cout << BLUE << "[DEBUG] - case: INVITE" << RESET << std::endl;
+                break;
+                
+            case KICK:
+                std::cout << BLUE << "[DEBUG] - case: KICK" << RESET << std::endl;
+                break;
+                
             case ERROR:
                 throw std::runtime_error("ERROR :No existing command\n");
         }
@@ -102,6 +130,7 @@ void Server::clientInputCommand(int clientFd, std::string &inputClient) {
         sendCommand(clientFd, e.what());
     }
 }; 
+
 
 ///////////////////////////////// Commands //////////////////////////////////////////////
 
@@ -298,10 +327,28 @@ keyWordInput getKeyWord(std::string &inputClient, size_t start, size_t end) {
         keyWord.value = MODE;        
     }
     else if (keyWordInput == "QUIT") {
-        keyWord.value = QUIT;        
+        keyWord.value = QUIT;
+    }        
+    else if (keyWordInput == "JOIN") {
+        keyWord.value = JOIN;        
     }
-    else if (keyWordInput == "WHOIS") {
-        keyWord.value = WHOIS;        
+    else if (keyWordInput == "PRIVMSG") {
+        keyWord.value = PRIVMSG;        
+    }
+    else if (keyWordInput == "USER") {
+        keyWord.value = USER;        
+    }
+    else if (keyWordInput == "KICK") {
+        keyWord.value = KICK;        
+    }
+    else if (keyWordInput == "TOPIC") {
+        keyWord.value = TOPIC;
+    }        
+    else if (keyWordInput == "PASS") {
+        keyWord.value = PASS;        
+    }
+    else if (keyWordInput == "INVITE") {
+        keyWord.value = INVITE;        
     }
     else
     keyWord.value = ERROR;        
