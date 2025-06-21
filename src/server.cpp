@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/20 15:19:19 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/21 11:17:33 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,11 +18,19 @@ Server::Server(int port, std::string password) : port_(port), password_(password
 
 Server::~Server() {
 
-    std::cout << "destructor" << std::endl;
+    std::cout << BLUE << "[DEBUG] - destructor Server" << RESET << std::endl;    
+
     for (size_t i = 0; i < users_.size(); ++i) {
         delete users_[i];
     }
-    users_.clear();
+    users_.clear(); 
+    
+    // for (size_t i = 0; i < channels_.size(); ++i) {
+    //     delete channels_[i];
+    // }
+    // channels_.clear(); 
+
+    
     close(this->socket_);    
 };
 
@@ -30,9 +38,9 @@ Server::~Server() {
 void Server::createServer(void) {
 
     struct sockaddr_in addressServer;
+    int opt = 1;
         
     this->socket_ = socket(AF_INET, SOCK_STREAM, 0);
-    int opt = 1;
     setsockopt(this->socket_, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
     memset(&addressServer, 0, sizeof(addressServer));
     addressServer.sin_family = AF_INET;
@@ -146,6 +154,23 @@ void Server::addNewClient(epoll_event &user_ev, int epfd) {
     
 };
 
+// void cleanupChannels() {
+    
+// for (size_t y = 0; y < this->channels_.size(); ++y) {
+//         for (size_t i = 0; i < this->channels_[y]->channelmembre_.size(); ++i) {
+//             delete this->channels_[y]->channelmembre_[i];
+//         }
+//         for (size_t i = 0; i < this->channels_[y]->channelInvited_.size(); ++i) {
+//             delete this->channels_[y]->channelInvited_[i];
+//         }   
+//         for (size_t i = 0; i < this->channels_[y]->channelBoss_.size(); ++i) {
+//             delete this->channels_[y]->channelBoss_[i];
+//         }       
+//     }
+    
+// }
+
+
 
 void Server::userLoopCheck() {
 
@@ -182,6 +207,9 @@ void Server::userLoopCheck() {
             }
         } 
     }
+    
+    //cleanupChannels();
+    this->channels_.clear(); 
     close(epfd);
 }
 

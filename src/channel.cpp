@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/19 06:53:08 by nrobinso          #+#    #+#             */
-/*   Updated: 2025/06/20 11:49:39 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/21 09:44:24 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,8 @@ Channel::Channel(std::string name): channelName_(name) {
 };
 
 Channel::~Channel(void) {
-    std::cout << "Channel Destructor" << std::endl;
-    
+    std::cout << BLUE << "[DEBUG - destructor Channel]" << RESET << std::endl;    
+
 };
 
 std::string Channel::getChannelName(void) {

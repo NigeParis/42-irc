@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/19 06:44:33 by nrobinso          #+#    #+#             */
-/*   Updated: 2025/06/20 13:08:38 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/21 09:09:57 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,9 +34,9 @@ class Channel {
         void setChannelTopic(std::string name);
 
 
-        std::vector<User*> channelmembre;
-        std::vector<User*> channelInvited;
-        std::vector<User*> channelBoss;
+        std::vector<User*> channelmembre_;
+        std::vector<User*> channelInvited_;
+        std::vector<User*> channelBoss_;
 
     private:
 

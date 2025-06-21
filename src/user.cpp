@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/06 11:07:49 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/18 17:21:26 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/21 09:42:37 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@ User::User(int fd, short events, short revents): nickName_("guest"), userName_("
 
 User::~User(void) {
     
+    std::cout << BLUE << "[DEBUG - destructor User]" << RESET << std::endl;    
+  
 };
 
 void User::setUserFd(int fd) {

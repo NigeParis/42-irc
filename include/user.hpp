@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/05 15:01:27 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/19 07:23:55 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/21 09:45:49 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ class User {
 
 
         struct pollfd user_pollfd;
-        Channel *channel;
+        Channel *channel_;
         
     private:
 

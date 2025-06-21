@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:08 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/20 10:58:01 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/21 07:32:01 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,8 @@ class Server {
         void nick(int clientFd, std::string &inputClient, User *user);
         int nickCommand(int clientFd, std::string input);
 
-
+        void join(int clientFd, std::string &inputClient, User *user);
+    
 
         
         int checkForSpaces(int clientFd, std::string &input);

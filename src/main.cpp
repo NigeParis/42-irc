@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:53:53 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/13 11:39:18 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/21 11:04:02 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,5 +22,8 @@ int main(int argc, char *argv[]) {
     Server server(atoi(argv[1]), argv[2]);
     server.createServer(); 
     server.userLoopCheck();
+
+
+    
     return 0;
 }

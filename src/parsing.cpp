@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 14:04:16 by nrobinso          #+#    #+#             */
-/*   Updated: 2025/06/20 17:09:19 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/21 10:51:45 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,11 +79,7 @@ void Server::clientInputCommand(int clientFd, std::string &inputClient) {
                 break;
             }
             case NICK: {
-                std::cout << BLUE << "[DEBUG] - case: NICK" << RESET << std::endl;
-                testmessage = ":" + user->getNickName() + "!nrobinso@localhost NICK #coucou\r\n";
-                std::cout << testmessage << std::endl;
-                send(clientFd, testmessage.c_str(), testmessage.size(), 0);      
-                // nick(clientFd, inputClient, user);
+                nick(clientFd, inputClient, user);
                 break;
             }
             case MODE:
@@ -96,6 +92,7 @@ void Server::clientInputCommand(int clientFd, std::string &inputClient) {
 
             case JOIN:
                 std::cout << BLUE << "[DEBUG] - case: JOIN" << RESET << std::endl;
+                join(clientFd, inputClient, user);
                 break;
 
             case WHOIS:
@@ -151,6 +148,44 @@ int Server::sendCommand(int clientFd, std::string commandToBeSent) {
 };
 
 
+void Server::join(int clientFd, std::string &inputClient, User *user) {
+    std::string channel = extractClientData(inputClient, "JOIN ");
+    std::string nick = user->getNickName();
+    std::string serverName = "localhost";
+    std::string message;
+
+    Channel *newChannel = new Channel(channel);
+
+   
+    // 332 RPL_TOPIC (prefix = server)
+    message = ":" + serverName + " 332 " + nick + " " + channel + " :Welcome to the chatroom!\r\n";
+    sendCommand(clientFd, message);
+
+    // 333 RPL_TOPICWHOTIME (prefix = server)
+    message = ":" + serverName + " 333 " + nick + " " + channel + " admin!nrobinso@localhost 1719055420\r\n";
+    sendCommand(clientFd, message);
+
+    // 353 RPL_NAMREPLY
+    message = ":" + serverName + " 353 " + nick + " = " + channel + " :@admin +user1 " + nick + "\r\n";
+    sendCommand(clientFd, message);
+
+    // 366 RPL_ENDOFNAMES
+    message = ":" + serverName + " 366 " + nick + " " + channel + " :End of /NAMES list.\r\n";
+    sendCommand(clientFd, message);
+
+    message = ":" + serverName + " 324 " + nick + " " + channel + " +nt\r\n";
+    sendCommand(clientFd, message);
+
+    
+    std::cout << BLUE << "[DEBUG] - channelName: " << newChannel->getChannelName() << RESET << std::endl;
+    std::cout << BLUE << "[DEBUG] - channelPassword: " << newChannel->getChannelPassword() << RESET << std::endl;
+    std::cout << BLUE << "[DEBUG] - channelTopic: " << newChannel->getChannelTopic() << RESET << std::endl;
+
+    delete newChannel;
+}
+
+
+
 void Server::pong(int clientFd, std::string input) {
 
     std::string buildMessage;
@@ -166,7 +201,8 @@ void Server::cap(int clientFd, std::string &inputClient, User *user) {
     
     std::string welcomeMessage = putWelcomeMessage(user);
     std::string nickName = extractClientData(inputClient, "NICK ");   
-    std::string userName = extractClientData(inputClient, "USER ");
+    std::string userName = extractClientData(inputClient, "USER ");    std::cout << "Channel Destructor" << std::endl;
+
     bool nameDoubleFlag = false;
     userName = trimUserName(userName);
 
