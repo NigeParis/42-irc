@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/16 20:23:35 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/21 11:17:33 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,11 +18,19 @@ Server::Server(int port, std::string password) : port_(port), password_(password
 
 Server::~Server() {
 
-    std::cout << "destructor" << std::endl;
+    std::cout << BLUE << "[DEBUG] - destructor Server" << RESET << std::endl;    
+
     for (size_t i = 0; i < users_.size(); ++i) {
         delete users_[i];
     }
-    users_.clear();
+    users_.clear(); 
+    
+    // for (size_t i = 0; i < channels_.size(); ++i) {
+    //     delete channels_[i];
+    // }
+    // channels_.clear(); 
+
+    
     close(this->socket_);    
 };
 
@@ -30,9 +38,9 @@ Server::~Server() {
 void Server::createServer(void) {
 
     struct sockaddr_in addressServer;
+    int opt = 1;
         
     this->socket_ = socket(AF_INET, SOCK_STREAM, 0);
-    int opt = 1;
     setsockopt(this->socket_, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
     memset(&addressServer, 0, sizeof(addressServer));
     addressServer.sin_family = AF_INET;
@@ -49,21 +57,41 @@ void Server::makeUser(void) {
     struct sockaddr_in client_addr;
     socklen_t client_addr_len = sizeof(client_addr);
     
-    int client_fd = accept(socket_, (struct sockaddr *)&client_addr, &client_addr_len);
-    if (client_fd == -1) {
+    int clientFd = accept(socket_, (struct sockaddr *)&client_addr, &client_addr_len);
+    if (clientFd == -1) {
         std::cout << "Error: creating client FD" << std::endl;
         SigHandler::sigloop = false;
         return ;
     }
-    fcntl(client_fd, F_SETFL, O_NONBLOCK);
-    User* user = new User(client_fd, POLLIN, 0);    
+    fcntl(clientFd, F_SETFL, O_NONBLOCK);
+    User* user = new User(clientFd, POLLIN, 0); 
     users_.push_back(user);
     std::string name = user->getNickName(); // default name
-    user->setNickName(name);
+    user->setNickName(name);    
     Server::timeStamp(); 
-    std::cout << BLUE << "[LOGIN]     " << RESET << "<" << GREEN << user->getNickName() << RESET << ">" << " Just arrived " << std::endl;   
+    std::cout << BLUE << "[LOGIN]     " << RESET << "<" << GREEN << std::setfill(' ') << std::setw(8) << user->getNickName() << RESET << ">" << " Just arrived " << std::endl;   
+
 }
 
+
+
+   
+
+
+void Server::clientQuits(int fd, User &user) {
+
+    std::vector<User*>::iterator it = std::find(users_.begin(), users_.end(), &user);
+    Server::timeStamp(); 
+    std::cout << BLUE << "[LOGOUT]    " << RESET << "<" << GREEN << std::setfill(' ') << std::setw(8)  << user.getNickName() << RESET << ">" << " Just left " << std::endl;
+    this->lastClientToWrite_ = 0;  
+    close(fd);
+    delete &user;
+    if (it != users_.end()) {
+        users_.erase(it);
+        Server::timeStamp();
+        std::cout << YELLOW << "[CLIENTS]   " << RESET << "<" << std::setfill(' ') << std::setw(7) << YELLOW  << "active"  << RESET << "> " << users_.size() << std::endl;
+    }            
+};
 
 void Server::readMessage(User &user) {
 
@@ -72,36 +100,26 @@ void Server::readMessage(User &user) {
     
     int fd = user.getUserFd();
     ssize_t bytes_read = recv(user.getUserFd(), &buffer[0], buffer.size() - 1, 0);
-    if (bytes_read == 0) {
-        std::vector<User*>::iterator it = std::find(users_.begin(), users_.end(), &user);
-        Server::timeStamp(); 
-        std::cout << BLUE << "[LOGOUT]    " << RESET << "<" << GREEN << user.getNickName() << RESET << ">" << " Just left " << std::endl;
-        this->lastClientToWrite_ = 0;  
-        close(fd);
-        delete &user;
-        if (it != users_.end()) {
-            users_.erase(it);
-            Server::timeStamp(); 
-            std::cout << YELLOW << "[CLIENTS]   " << RESET << users_.size() << std::endl;
-            return ;
-        }            
+    if ((bytes_read == 0) || SigHandler::sigloop == false) {
+        clientQuits(fd, user);
+        return ;
     }
     if (bytes_read == -1) {
         std::cout << "error recv()" << std::endl;
         return ;
     }
-    else if (buffer[0] == '\r')
+    if (buffer[0] == '\r')
         return;
     else if (bytes_read != -1) {
         if (bytes_read && lastClientToWrite_ != user.getUserFd() && buffer[0] != '\r') {
             Server::timeStamp(); 
-            std::cout << RED << "[MESSAGE]   " << RESET << "<" << GREEN << user.getNickName() << RESET << "> " << RESET;
+            std::cout << RED << "[MESSAGE]   " << RESET << "<" << GREEN << std::setfill(' ') << std::setw(8) << user.getNickName() << RESET << "> ";
         }
         checkfd = user.getUserFd();
         std::cout << buffer;
 
-        clientInputCommand(user.getUserFd(), buffer);     // commands recieved from client    
-
+        clientInputCommand(user.getUserFd(), buffer);     // commands recieved from client  
+        
         
         if (buffer[bytes_read - 2] == '\r')
             this->lastClientToWrite_ = 0;
@@ -122,15 +140,35 @@ void Server::getClientMessage (int client_fd){
 
 void Server::addNewClient(epoll_event &user_ev, int epfd) {
 
-        makeUser();
-        if (SigHandler::sigloop == false)
+    std::string message;
+    makeUser();
+    if (SigHandler::sigloop == false) 
         return ;
-        user_ev.events = EPOLLIN;
-        user_ev.data.fd = users_.back()->user_pollfd.fd;
-        epoll_ctl(epfd, EPOLL_CTL_ADD, users_.back()->user_pollfd.fd, &user_ev);
-        Server::timeStamp(); 
-        std::cout << YELLOW << "[CLIENTS]   " << RESET << users_.size() << std::endl;
+
+    user_ev.events = EPOLLIN;
+    user_ev.data.fd = users_.back()->user_pollfd.fd;
+    epoll_ctl(epfd, EPOLL_CTL_ADD, users_.back()->user_pollfd.fd, &user_ev);
+    Server::timeStamp(); 
+    std::cout << YELLOW << "[CLIENTS]   " << RESET << "<" << std::setfill(' ') << std::setw(7) << YELLOW  << "active"  << RESET << "> " << users_.size() << std::endl;
+
+    
 };
+
+// void cleanupChannels() {
+    
+// for (size_t y = 0; y < this->channels_.size(); ++y) {
+//         for (size_t i = 0; i < this->channels_[y]->channelmembre_.size(); ++i) {
+//             delete this->channels_[y]->channelmembre_[i];
+//         }
+//         for (size_t i = 0; i < this->channels_[y]->channelInvited_.size(); ++i) {
+//             delete this->channels_[y]->channelInvited_[i];
+//         }   
+//         for (size_t i = 0; i < this->channels_[y]->channelBoss_.size(); ++i) {
+//             delete this->channels_[y]->channelBoss_[i];
+//         }       
+//     }
+    
+// }
 
 
 void Server::userLoopCheck() {
@@ -168,6 +206,9 @@ void Server::userLoopCheck() {
             }
         } 
     }
+    
+    //cleanupChannels();
+    this->channels_.clear(); 
     close(epfd);
 }
 
@@ -182,6 +223,7 @@ User* Server::findUserByFd(int fd) {
     }
     return NULL;
 };
+
 
 
 void Server::putServerBanner(void) {
@@ -220,14 +262,14 @@ std::string  Server::putClientBanner(void) {
 void Server::sendMessage(User &user, std::string message) {
 
     if (user.getUserFd() > -1 && !message.empty())
-        send(user.getUserFd(), message.c_str(), message.size(), 0);
+        sendCommand(user.getUserFd(), message);
 };
 
 
 void Server::sendMessageAll(std::string message) {
 
     for (size_t i = 0;  i < users_.size(); i++)
-        send(users_[i]->getUserFd(), message.c_str(), message.size(), 0);
+        sendCommand(users_[i]->getUserFd(), message);
 };
 
 
@@ -241,6 +283,6 @@ void Server::timeStamp(void) {
     << std::setw(2) << localTime->tm_hour 
     << ":" 
     << std::setw(2) << localTime->tm_min 
-    << ":" << std::setw(2) 
-    << localTime->tm_sec << " ";
+    << ":" 
+    << std::setw(2) << localTime->tm_sec << " ";
 };

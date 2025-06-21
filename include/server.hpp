@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:08 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/16 20:35:13 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/21 07:32:01 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@
 
 #include "user.hpp"
 #include "SigHandler.hpp"
-#include "serverCommands.hpp"
 #include "parsing.hpp"
 
 #define RED "\033[31m"
@@ -50,6 +49,7 @@
 #define BUFFER 1024
 
 class User;
+class Channel;
 
 class Server {
 
@@ -71,18 +71,38 @@ class Server {
 
         void sendMessageAll(std::string message);
 
-
         void timeStamp(void);
-        void pong(int socket, std::string message);
-        int cap(int socket, std::string message);
-
-
-        //parsing commands
-        void clientInputCommand (int socket, std::string &inputClient); 
         
+        
+        //parsing commands
+        void clientInputCommand (int clientFD, std::string &inputClient); 
+        void pong(int clientFd, std::string input);
+        void clientQuits(int fd, User &user);
+        std::string trimUserName(std::string &userName);
+        std::string extractClientData(std::string &input, std::string strFind);
+        int checkLeadingHash(int clientFd, std::string &input);
+        void putErrorMessage(int clientFd, std::string &input, std::string errorMsg, int code);
+        std::string extractRealName(std::string &realName);
+        std::string putWelcomeMessage(User *user);
+        
+        void cap(int clientFd, std::string &inputClient, User *user);
+        int sendCommand(int clientFd, std::string input);
+        
+        void nick(int clientFd, std::string &inputClient, User *user);
+        int nickCommand(int clientFd, std::string input);
+
+        void join(int clientFd, std::string &inputClient, User *user);
+    
+
+        
+        int checkForSpaces(int clientFd, std::string &input);
+
+        
+        int initClientsNames(int clientFd,  std::string &inputClient, User &user);
 
         
         std::vector<User*> users_;
+        std::vector<Channel*> channels_;
 
     private:
         
