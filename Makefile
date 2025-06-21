@@ -17,6 +17,7 @@ CXX=c++
 
 SRC_DIR = src/
 SRC = main.cpp server.cpp user.cpp SigHandler.cpp
+
 SRC += parsing.cpp channel.cpp
 
 OBJ_DIR = build/

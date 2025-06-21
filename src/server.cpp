@@ -171,7 +171,6 @@ void Server::addNewClient(epoll_event &user_ev, int epfd) {
 // }
 
 
-
 void Server::userLoopCheck() {
 
 

@@ -7,11 +7,11 @@
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/15 14:04:16 by nrobinso          #+#    #+#             */
 /*   Updated: 2025/06/21 10:51:45 by nrobinso         ###   ########.fr       */
+
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/parsing.hpp"
-
 
 int Server::initClientsNames(int clientFd, std::string &inputClient, User &user) {
 
@@ -188,6 +188,7 @@ void Server::join(int clientFd, std::string &inputClient, User *user) {
 
 void Server::pong(int clientFd, std::string input) {
 
+
     std::string buildMessage;
     
     buildMessage = "PONG ";
@@ -220,7 +221,6 @@ void Server::cap(int clientFd, std::string &inputClient, User *user) {
         }
     }
 }
-
 
 
 void Server::nick(int clientFd, std::string &inputClient, User *user) {

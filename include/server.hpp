@@ -71,7 +71,6 @@ class Server {
 
         void sendMessageAll(std::string message);
 
-
         void timeStamp(void);
         
         
