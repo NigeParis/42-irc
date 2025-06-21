@@ -109,6 +109,7 @@ void Server::clientInputCommand(int clientFd, std::string &inputClient) {
 
             case TOPIC:
                 std::cout << BLUE << "[DEBUG] - case: TOPIC" << RESET << std::endl;
+                topic(clientFd, inputClient, user);
                 break;
 
             case PASS:
@@ -120,14 +121,24 @@ void Server::clientInputCommand(int clientFd, std::string &inputClient) {
                 break;
             case PART:
                 std::cout << BLUE << "[DEBUG] - case: PART" << RESET << std::endl;
-                testmessage = ":" + user->getNickName() + "!nrobinso@localhost PART #test\r\n";
-                std::cout << testmessage << std::endl;
-                send(clientFd, testmessage.c_str(), testmessage.size(), 0);       
+                part(clientFd, inputClient, user);
                 break;  
             case KICK:
                 std::cout << BLUE << "[DEBUG] - case: KICK" << RESET << std::endl;
                 break;
-                
+
+            case LIST:
+                std::cout << BLUE << "[DEBUG] - case: LIST" << RESET << std::endl;
+                for (std::vector<Channel*>::iterator it = channels_.begin(); it < channels_.end(); it++) {
+                    std::cout << BLUE << "[DEBUG] - channel[i] output: " << (*it)->getChannelName() << RESET << std::endl;
+                }
+                break;
+
+            case WHO:
+                std::cout << BLUE << "[DEBUG] - case: WHO" << RESET << std::endl;
+                sendCommand(clientFd, ":localhost 352 nrobinso test nrobinso localhost localhost nrobinso H@ :0 Nigel Robinson\r\n");
+                break;
+
             case ERROR:
                 throw std::runtime_error("ERROR :No existing command\n");
         }
@@ -147,6 +158,53 @@ int Server::sendCommand(int clientFd, std::string commandToBeSent) {
     return (1);
 };
 
+void Server::part(int clientFd, std::string &inputClient, User *user) {
+
+  std::string channel = extractClientData(inputClient, "PART ");
+
+
+  std::string message = ":" + user->getNickName() + "!nrobinso@localhost PART " + channel +"\r\n";
+                std::cout << message << std::endl;
+                send(clientFd, message.c_str(), message.size(), 0);       
+}
+
+
+std::vector<Channel*>::iterator Server::findTopicByChannelName(std::string name) {
+    for (std::vector<Channel*>::iterator it = channels_.begin(); it != channels_.end(); it++) {
+        if ((*it)->getChannelName() == "#" + name) {
+            return it;
+        }
+    }
+    return channels_.begin();
+}
+
+
+void Server::topic(int clientFd, std::string &inputClient, User *user) {
+
+    (void)clientFd;
+    (void)inputClient;
+    (void)user;
+    std::string serverName = "localhost";
+    std::string topic = extractClientData(inputClient, "TOPIC ");
+    std::string channel = extractChannel(topic);
+    User *nick = findUserByFd(clientFd);
+    topic = extractTopic(topic);
+
+
+    
+    std::string message = ":" + serverName + " 332 " + nick->getNickName() + " #" + channel + " :" + topic + "\r\n";
+    std::cout << BLUE << "[DEBUG] - " << message << RESET << std::endl;
+    sendCommand(clientFd, message);
+    
+    std::cout << GREEN << "[DEBUG] - topic(): " << (*findTopicByChannelName(channel))->getChannelTopic() << RESET << std::endl;;
+
+
+    
+};
+
+
+
+
 
 void Server::join(int clientFd, std::string &inputClient, User *user) {
     std::string channel = extractClientData(inputClient, "JOIN ");
@@ -158,30 +216,34 @@ void Server::join(int clientFd, std::string &inputClient, User *user) {
 
    
     // 332 RPL_TOPIC (prefix = server)
-    message = ":" + serverName + " 332 " + nick + " " + channel + " :Welcome to the chatroom!\r\n";
+
+    
+    message = ":" + serverName + " 332 " + nick + " " + channel + " :" + newChannel->getChannelTopic() + "\r\n";
+    std::cout << BLUE << "[DEBUG] - " << message << RESET << std::endl;
     sendCommand(clientFd, message);
 
     // 333 RPL_TOPICWHOTIME (prefix = server)
-    message = ":" + serverName + " 333 " + nick + " " + channel + " admin!nrobinso@localhost 1719055420\r\n";
-    sendCommand(clientFd, message);
+    // message = ":" + serverName + " 333 " + nick + " " + channel + " admin!nrobinso@localhost 1719055420\r\n";
+    // sendCommand(clientFd, message);
 
-    // 353 RPL_NAMREPLY
-    message = ":" + serverName + " 353 " + nick + " = " + channel + " :@admin +user1 " + nick + "\r\n";
-    sendCommand(clientFd, message);
+    // // 353 RPL_NAMREPLY
+    // message = ":" + serverName + " 353 " + nick + " = " + channel + " :@admin +user1 " + nick + "\r\n";
+    // sendCommand(clientFd, message);
 
     // 366 RPL_ENDOFNAMES
-    message = ":" + serverName + " 366 " + nick + " " + channel + " :End of /NAMES list.\r\n";
-    sendCommand(clientFd, message);
+    // message = ":" + serverName + " 366 " + nick + " " + channel + " :End of /NAMES list.\r\n";
+    // sendCommand(clientFd, message);
 
-    message = ":" + serverName + " 324 " + nick + " " + channel + " +nt\r\n";
-    sendCommand(clientFd, message);
+    // message = ":" + serverName + " 324 " + nick + " " + channel + " +nt\r\n";
+    // sendCommand(clientFd, message);
 
     
     std::cout << BLUE << "[DEBUG] - channelName: " << newChannel->getChannelName() << RESET << std::endl;
     std::cout << BLUE << "[DEBUG] - channelPassword: " << newChannel->getChannelPassword() << RESET << std::endl;
     std::cout << BLUE << "[DEBUG] - channelTopic: " << newChannel->getChannelTopic() << RESET << std::endl;
 
-    delete newChannel;
+    this->channels_.push_back(newChannel);
+
 }
 
 
@@ -266,7 +328,7 @@ int Server::nickCommand(int clientFd, std::string input) {
 
 
 
-
+///////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////// Parsing tools ////////////////////////////////////////
 
 
@@ -292,6 +354,26 @@ int Server::checkForSpaces(int clientFd, std::string &input) {
 };
 
 
+std::string extractTopic(std::string &topic) {
+
+    std::string newTopic;
+    int start = topic.find(":") + 1;
+    int end = topic.size();
+    newTopic = topic.substr(start, end);
+    std::cout << BLUE << "[DEBUG] - extractChannel: " << "'" << newTopic << "'" << RESET << std::endl;
+    return (newTopic);
+}
+
+std::string extractChannel(std::string &topic) {
+
+    std::string channel;
+    int start = 1;
+    int end = topic.find(" ") - 1;
+    channel = topic.substr(start, end);
+    std::cout << BLUE << "[DEBUG] - extractChannel: " << "'" << channel << "'" << RESET << std::endl;
+    return (channel);
+}
+
 
 
 // Checks for leading #nick - interdiction error (432)
@@ -309,7 +391,6 @@ int Server::checkLeadingHash(int clientFd, std::string &input) {
     }
     return (0);
 };
-
 
 std::string Server::trimUserName(std::string &userName) {
     
@@ -393,6 +474,12 @@ keyWordInput getKeyWord(std::string &inputClient, size_t start, size_t end) {
     }
     else if (keyWordInput == "PART") {
         keyWord.value = PART;        
+    }
+    else if (keyWordInput == "WHO") {
+        keyWord.value = WHO;        
+    }
+    else if (keyWordInput == "LIST") {
+        keyWord.value = LIST;        
     }
     else if (keyWordInput == "INVITE") {
         keyWord.value = INVITE;        

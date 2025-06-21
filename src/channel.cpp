@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/19 06:53:08 by nrobinso          #+#    #+#             */
-/*   Updated: 2025/06/21 09:44:24 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/21 15:21:26 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,13 +16,13 @@
 Channel::Channel(std::string name): channelName_(name) {
 
     //std::cout << "Channel constructor" << std::endl;
-    this->I_ = false;
-    this->K_ = false;
-    this->L_ = false;
-    this->O_ = false;
-    this->T_ = false;
+    this->I_ = false;  // set/remove Invite only channel
+    this->T_ = false;  // set/remove topic command to channel operators
+    this->K_ = false;  // set/remove channel key password
+    this->O_ = false;  // give/take channel operator privilege
+    this->L_ = false;  // set/remove user limit to channel
     this->channelPassword_ = "";
-    this->channelTopic_ = "";
+    this->channelTopic_ = "Default Unknown Topic";
 };
 
 Channel::~Channel(void) {
