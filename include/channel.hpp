@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/19 06:44:33 by nrobinso          #+#    #+#             */
-/*   Updated: 2025/06/21 09:09:57 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/22 09:30:33 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,18 +33,23 @@ class Channel {
         std::string getChannelTopic(void);
         void setChannelTopic(std::string name);
 
-
+        /// @brief stores the users of the channel that are membres, invited and adminstrators
         std::vector<User*> channelmembre_;
         std::vector<User*> channelInvited_;
         std::vector<User*> channelBoss_;
 
     private:
 
+        /// @brief used to strore the name of the channel
         std::string channelName_;
+        /// @brief used to store a password needed to acess a channel
         std::string channelPassword_;
+        /// @brief used to store the topic title of the channel
         std::string channelTopic_;
 
-
+        /// @brief used with cmd MODE
+        /// @brief boolenas to turn onm or off options of the channel
+        /// @brief exe: I_ = true - invite only channel
         bool I_;
         bool T_;
         bool K_;

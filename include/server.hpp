@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:08 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/21 16:41:58 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/22 09:49:40 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,8 @@
 #include "user.hpp"
 #include "SigHandler.hpp"
 #include "parsing.hpp"
+#include "parsingTools.hpp"
+
 
 #define RED "\033[31m"
 #define BLUE "\033[34m"
@@ -99,9 +101,9 @@ class Server {
         std::vector<Channel*>::iterator findTopicByChannelName(std::string  name);
 
         
+
         int checkForSpaces(int clientFd, std::string &input);
 
-        
         int initClientsNames(int clientFd,  std::string &inputClient, User &user);
 
         
