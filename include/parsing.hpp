@@ -12,32 +12,31 @@
 
 #pragma once
 
+#include "server.hpp"
 #include <iostream>
 #include <string>
-#include "server.hpp"
-
 
 enum keyWord {
 
-    PING,
-    CAP,
-    NICK,
-    MODE,
-    QUIT,
-    WHOIS,
-    JOIN,
-    PRIVMSG,
-    USER,
-    PASS,
-    TOPIC,
-    INVITE,
-    KICK,
-    ERROR,
-    PART    
+  PING,
+  CAP,
+  NICK,
+  MODE,
+  QUIT,
+  WHOIS,
+  JOIN,
+  PRIVMSG,
+  USER,
+  PASS,
+  TOPIC,
+  INVITE,
+  KICK,
+  ERROR,
+  PART
 };
 
 struct keyWordInput {
-    keyWord value;  
+  keyWord value;
 };
 
 keyWordInput getKeyWord(std::string &inputClient, size_t start, size_t end);
