@@ -110,4 +110,7 @@ private:
   // Utility functions
   std::string getCurrentTime();
   bool setNonBlocking(int fd);
+  bool isAvailableNickname(const std::string &nickname);
+  bool isValidNickname(const std::string &nickname);
+  std::set<int> getChannelsClientList(int client_fd);
 };

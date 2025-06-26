@@ -11,7 +11,7 @@ public:
   int socket_fd;
   std::string nickname;
   std::string username;
-  std::string realname;
+  std::string hostname;
   bool is_authenticated;
   std::string buffer;
 

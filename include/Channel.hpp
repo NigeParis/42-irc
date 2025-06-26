@@ -26,6 +26,7 @@ public:
   void removeUser(int user_fd);
   bool hasUser(int user_fd) const;
 
+  std::vector<int> getClientFds();
   // Getters
-  std::string getTopic() const { return topic; }
+  std::string getTopic() const;
 };

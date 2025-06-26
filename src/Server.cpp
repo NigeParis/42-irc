@@ -269,13 +269,49 @@ void Server::handlePong(int client_fd, const Command &command) {
 }
 
 void Server::handleNick(int client_fd, const Command &command) {
-  std::cout << BLUE << "[DEBUG] - case: NICK" << RESET << std::endl;
-  std::cout << "params: ";
-  for (size_t i = 0; i < command.params.size(); ++i) {
-    std::cout << command.params[i] << " ";
-  };
-  std::cout << std::endl;
-  std::cout << "==================================" << std::endl;
+  Client *client = clients[client_fd];
+  Command cmd;
+  cmd.prefix = "ircserv";
+
+  if (command.params.size() < 1) {
+    cmd.name = "431";
+    cmd.params.push_back(client->nickname);
+    cmd.trailing = "No nickname given";
+    std::string response = buildMessage(cmd);
+    sendResponse(client_fd, response);
+    return;
+  }
+
+  if (!isValidNickname(command.params[0])) {
+    cmd.name = "432";
+    cmd.params.push_back(client->nickname);
+    cmd.trailing = "Erroneous nickname";
+    std::string response = buildMessage(cmd);
+    sendResponse(client_fd, response);
+    return;
+  }
+
+  if (!isAvailableNickname(command.params[0])) {
+    cmd.name = "433";
+    cmd.params.push_back(client->nickname);
+    cmd.trailing = "Nickname is already in use";
+    std::string response = buildMessage(cmd);
+    sendResponse(client_fd, response);
+    return;
+  }
+  cmd.prefix = client->nickname + client->username + "@" + client->hostname;
+  cmd.name = "NICK";
+  cmd.trailing = command.params[0];
+  std::string response = buildMessage(cmd);
+  client->nickname = command.params[0];
+
+  std::set<int> client_fds = getChannelsClientList(client_fd);
+  broadcastResponse(response,
+                    std::vector<int>(client_fds.begin(), client_fds.end()));
+
+  std::cout << GREEN
+            << "[DEBUG] - client changed nickname to: " << command.params[0]
+            << RESET << std::endl;
 }
 
 void Server::handleJoin(int client_fd, const Command &command) {
@@ -365,6 +401,52 @@ void Server::handleInvite(int client_fd, const Command &command) {
 void Server::handleUnknownCommand(int client_fd, const Command &command) {
   std::string response = "Unknown command: " + command.name + "\r\n";
   sendResponse(client_fd, response);
+}
+
+bool Server::isAvailableNickname(const std::string &nickname) {
+  for (std::map<int, Client *>::iterator it = clients.begin();
+       it != clients.end(); ++it) {
+    if (it->second->nickname == nickname) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool Server::isValidNickname(const std::string &nickname) {
+  if (nickname.empty())
+    return false;
+
+  if (std::isdigit(nickname[0]))
+    return false;
+
+  if (nickname[0] == '#' || nickname[0] == ':' ||
+      nickname.find(' ') != std::string::npos)
+    return false;
+
+  for (size_t i = 0; i < nickname.length(); ++i) {
+    char c = nickname[i];
+    if (!std::isalnum(c) && c != '[' && c != ']' && c != '{' && c != '}' &&
+        c != '\\' && c != '|' && c != '-' && c != '_') {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+std::set<int> Server::getChannelsClientList(int client_fd) {
+  std::set<int> client_fds;
+
+  for (std::map<std::string, Channel *>::iterator it = channels.begin();
+       it != channels.end(); ++it) {
+    Channel *channel = it->second;
+    if (channel->hasUser(client_fd)) {
+      std::vector<int> channel_fds = channel->getClientFds();
+      client_fds.insert(channel_fds.begin(), channel_fds.end());
+    }
+  }
+  return client_fds;
 }
 
 std::string Server::buildMessage(const Command &cmd) {
