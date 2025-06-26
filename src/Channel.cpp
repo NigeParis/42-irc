@@ -13,8 +13,8 @@ void Channel::addUser(Client &user) {
 }
 
 void Channel::removeUser(int user_fd) {
-  auto it = users.find(user_fd);
-  if (it != users.end()) {
+  std::map<int, Client *>::iterator it = users.find(user_fd);
+  if (users.find(user_fd) != users.end()) {
     users.erase(it);
   }
   if (operators.find(user_fd) != operators.end()) {

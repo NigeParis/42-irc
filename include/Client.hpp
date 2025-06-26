@@ -15,6 +15,6 @@ public:
   bool is_authenticated;
   std::string buffer;
 
-  Client(int fd);
+  Client(int fd, int guest_number);
   ~Client();
 };

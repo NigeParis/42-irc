@@ -10,8 +10,10 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/server.hpp"
+#include "../include/Server.hpp"
+#include <cstddef>
 #include <sstream>
+#include <vector>
 
 Server::Server(int port, std::string password)
     : port_(port), password_(password), lastClientToWrite_(0) {};
@@ -20,6 +22,21 @@ Server::~Server() {
   std::cout << BLUE << "[DEBUG] - destructor Server" << RESET << std::endl;
 
   close(this->socket_);
+  // TODO: correctly cleanupUsers();
+  for (std::map<int, Client *>::iterator it = clients.begin();
+       it != clients.end(); ++it) {
+    close(it->first);
+    delete it->second;
+  }
+  clients.clear();
+
+  for (std::map<std::string, Channel *>::iterator it = channels.begin();
+       it != channels.end(); ++it) {
+    delete it->second;
+  }
+  channels.clear();
+
+  // TODO: cleanupChannels();
 };
 
 void Server::createServer(void) {
@@ -76,8 +93,6 @@ void Server::userLoopCheck() {
     }
   }
 
-  // cleanupChannels();
-  this->channels_.clear();
   close(epfd);
 }
 
@@ -105,7 +120,8 @@ void Server::acceptNewClient(int epfd) {
     return;
   }
 
-  clients[client_fd] = new Client(client_fd);
+  lastClientToWrite_++;
+  clients[client_fd] = new Client(client_fd, lastClientToWrite_);
 
   std::cout << GREEN << "[DEBUG] - new client connected: " << client_fd << RESET
             << std::endl;
@@ -121,47 +137,69 @@ void Server::handleClientMessage(int client_fd) {
   char buffer[BUFFER];
   memset(buffer, 0, BUFFER);
   ssize_t bytes_read = recv(client_fd, buffer, BUFFER - 1, 0);
-  if (bytes_read <= 0) {
+  if (bytes_read < 0) {
     perror("recv failed");
+    return;
+  }
+  if (bytes_read == 0) {
+    std::cout << RED << "[DEBUG] - client disconnected: " << client_fd << RESET
+              << std::endl;
+    disconnectClient(client_fd);
     return;
   }
   buffer[bytes_read] = '\0';
   Client *client = clients[client_fd];
   client->buffer += buffer;
+
   if (client->buffer.substr(client->buffer.size() - 2) != "\r\n") {
     return;
   }
 
-  Command command = parseCommand(client->buffer);
+  std::cout << BLUE
+            << "[DEBUG] - received message from client: " << client->buffer
+            << RESET << std::endl;
+  std::cout << "==================================" << std::endl;
 
-  if (command.name == "PING")
-    handlePing(client_fd, command);
-  else if (command.name == "PONG")
-    handlePong(client_fd, command);
-  else if (command.name == "NICK")
-    handleNick(client_fd, command);
-  else if (command.name == "USER")
-    handleUser(client_fd, command);
-  else if (command.name == "PASS")
-    handlePass(client_fd, command);
-  else if (command.name == "JOIN")
-    handleJoin(client_fd, command);
-  else if (command.name == "PART")
-    handlePart(client_fd, command);
-  else if (command.name == "PRIVMSG")
-    handlePrivmsg(client_fd, command);
-  else if (command.name == "MODE")
-    handleMode(client_fd, command);
-  else if (command.name == "TOPIC")
-    handleTopic(client_fd, command);
-  else if (command.name == "KICK")
-    handleKick(client_fd, command);
-  else if (command.name == "INVITE")
-    handleInvite(client_fd, command);
-  else if (command.name == "QUIT")
-    handleQuit(client_fd, command);
-  else
-    handleUnknownCommand(client_fd, command);
+  std::vector<std::string> commands = split(client->buffer, "\r\n");
+  client->buffer.clear();
+
+  for (size_t i = 0; i < commands.size() - 1; ++i) {
+
+    Command command = parseCommand(commands[i]);
+    std::cout << GREEN << "[DEBUG] - command received: " << command.name
+              << RESET << std::endl;
+
+    if (command.name == "PING")
+      handlePing(client_fd, command);
+    else if (command.name == "CAP")
+      handleCap(client_fd, command);
+    else if (command.name == "PONG")
+      handlePong(client_fd, command);
+    else if (command.name == "NICK")
+      handleNick(client_fd, command);
+    else if (command.name == "USER")
+      handleUser(client_fd, command);
+    else if (command.name == "PASS")
+      handlePass(client_fd, command);
+    else if (command.name == "JOIN")
+      handleJoin(client_fd, command);
+    else if (command.name == "PART")
+      handlePart(client_fd, command);
+    else if (command.name == "PRIVMSG")
+      handlePrivmsg(client_fd, command);
+    else if (command.name == "MODE")
+      handleMode(client_fd, command);
+    else if (command.name == "TOPIC")
+      handleTopic(client_fd, command);
+    else if (command.name == "KICK")
+      handleKick(client_fd, command);
+    else if (command.name == "INVITE")
+      handleInvite(client_fd, command);
+    else if (command.name == "QUIT")
+      handleQuit(client_fd, command);
+    else
+      handleUnknownCommand(client_fd, command);
+  }
 }
 
 void Server::disconnectClient(int client_fd) {
@@ -203,6 +241,132 @@ Command Server::parseCommand(const std::string &input) {
   return command;
 }
 
+void Server::handlePing(int client_fd, const Command &command) {
+  (void)command;   // Unused parameter
+  (void)client_fd; // Unused parameter
+}
+
+void Server::handleCap(int client_fd, const Command &command) {
+  std::cout << BLUE << "[DEBUG] - case: CAP " << command.params[0] << RESET
+            << std::endl;
+  if (command.params[0] != "LS")
+    return;
+  std::cout << "==================================" << std::endl;
+
+  sendResponse(client_fd, "CAP * LS \r\n");
+}
+
+void Server::handlePong(int client_fd, const Command &command) {
+  (void)command;   // Unused parameter
+  (void)client_fd; // Unused parameter
+  std::cout << BLUE << "[DEBUG] - case: PONG" << RESET << std::endl;
+  std::cout << "params: ";
+  for (size_t i = 0; i < command.params.size(); ++i) {
+    std::cout << command.params[i] << " ";
+  };
+  std::cout << std::endl;
+  std::cout << "==================================" << std::endl;
+}
+
+void Server::handleNick(int client_fd, const Command &command) {
+  std::cout << BLUE << "[DEBUG] - case: NICK" << RESET << std::endl;
+  std::cout << "params: ";
+  for (size_t i = 0; i < command.params.size(); ++i) {
+    std::cout << command.params[i] << " ";
+  };
+  std::cout << std::endl;
+  std::cout << "==================================" << std::endl;
+}
+
+void Server::handleJoin(int client_fd, const Command &command) {
+  (void)command;   // Unused parameter
+  (void)client_fd; // Unused parameter
+}
+
+void Server::handlePart(int client_fd, const Command &command) {
+  (void)command;   // Unused parameter
+  (void)client_fd; // Unused parameter
+}
+
+void Server::handlePrivmsg(int client_fd, const Command &command) {
+  (void)command;   // Unused parameter
+  (void)client_fd; // Unused parameter
+}
+
+void Server::handleQuit(int client_fd, const Command &command) {
+  (void)command; // Unused parameter
+  std::cout << BLUE << "[DEBUG] - case: QUIT" << RESET << std::endl;
+  disconnectClient(client_fd);
+}
+
+void Server::handlePass(int client_fd, const Command &command) {
+
+  Client *client = clients[client_fd];
+  Command cmd;
+  cmd.prefix = "ircserv";
+  cmd.params.push_back(client->nickname);
+
+  if (client->is_authenticated) {
+
+    cmd.name = "462";
+    cmd.trailing = "You may not reregister";
+    std::string response = buildMessage(cmd);
+    sendResponse(client_fd, response);
+    disconnectClient(client_fd);
+    return;
+  }
+  if (command.params.size() < 1) {
+    cmd.name = "461";
+    cmd.trailing = "Not enough parameters";
+    std::string response = buildMessage(cmd);
+    sendResponse(client_fd, response);
+    return;
+  }
+  if (command.params[0] != password_) {
+    cmd.name = "464";
+    cmd.trailing = "Password incorrect";
+    std::string response = buildMessage(cmd);
+    sendResponse(client_fd, response);
+    disconnectClient(client_fd);
+    return;
+  }
+
+  std::cout << BLUE << "[DEBUG] client reregistered succesfully" << RESET
+            << std::endl;
+  client->is_authenticated = true;
+  return;
+}
+
+void Server::handleUser(int client_fd, const Command &command) {
+  (void)command;   // Unused parameter
+  (void)client_fd; // Unused parameter
+}
+
+void Server::handleMode(int client_fd, const Command &command) {
+  (void)command;   // Unused parameter
+  (void)client_fd; // Unused parameter
+}
+
+void Server::handleTopic(int client_fd, const Command &command) {
+  (void)command;   // Unused parameter
+  (void)client_fd; // Unused parameter
+}
+
+void Server::handleKick(int client_fd, const Command &command) {
+  (void)command;   // Unused parameter
+  (void)client_fd; // Unused parameter
+}
+
+void Server::handleInvite(int client_fd, const Command &command) {
+  (void)command;   // Unused parameter
+  (void)client_fd; // Unused parameter
+}
+
+void Server::handleUnknownCommand(int client_fd, const Command &command) {
+  std::string response = "Unknown command: " + command.name + "\r\n";
+  sendResponse(client_fd, response);
+}
+
 std::string Server::buildMessage(const Command &cmd) {
   std::ostringstream oss;
 
@@ -242,7 +406,7 @@ void Server::sendResponse(int client_fd, const std::string &response) {
 
 void Server::broadcastResponse(const std::string &message,
                                const std::vector<int> &client_fds) {
-  for (int i = 0; i < client_fds.size(); ++i) {
+  for (size_t i = 0; i < client_fds.size(); ++i) {
     sendResponse(client_fds[i], message);
   }
 }
@@ -291,7 +455,7 @@ void Server::putServerBanner(void) {
   std::cout << "server listening on port: " << this->port_ << std::endl;
   std::cout << "server password: " << this->password_ << std::endl;
   std::cout << std::endl;
-  std::cout << YELLOW << "Users connected: " << users_.size() << RESET
+  std::cout << YELLOW << "Users connected: " << clients.size() << RESET
             << std::endl;
   std::cout << "═══════════════════════════════════════════════════════════════"
                "════════ "
@@ -312,14 +476,4 @@ std::string Server::putClientBanner(void) {
   ss << "══════════════════════════════════════════════════════════════════ \n";
 
   return (ss.str());
-};
-
-void Server::timeStamp(void) {
-
-  std::time_t now = std::time(NULL);
-  std::tm *localTime = std::localtime(&now);
-
-  std::cout << std::setfill('0') << std::setw(2) << localTime->tm_hour << ":"
-            << std::setw(2) << localTime->tm_min << ":" << std::setw(2)
-            << localTime->tm_sec << " ";
 };

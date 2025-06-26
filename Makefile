@@ -2,7 +2,7 @@
 ## ARGUMENTS
 
 NAME= ircserv
-CXXFLAGS=  -Wall -Wextra -Werror -std=c++98
+CXXFLAGS= -g -Wall -Wextra -Werror -std=c++98
 
 SRCS=$(addprefix $(SRC_DIR), $(SRC))
 OBJ=$(SRC:.cpp=.o)
@@ -16,9 +16,9 @@ CXX=c++
 
 
 SRC_DIR = src/
-SRC = main.cpp server.cpp user.cpp SigHandler.cpp
+SRC = main.cpp Server.cpp  SigHandler.cpp
 
-SRC += parsing.cpp Channel.cpp Client.cpp Utils.cpp
+SRC +=  Channel.cpp Client.cpp Utils.cpp
 
 OBJ_DIR = build/
 

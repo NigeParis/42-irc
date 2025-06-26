@@ -36,7 +36,6 @@
 #include "Channel.hpp"
 #include "Client.hpp"
 #include "SigHandler.hpp"
-#include "parsing.hpp"
 /*#include "user.hpp"*/
 
 #define RED "\033[31m"
@@ -66,50 +65,12 @@ class Server {
 public:
   Server(int port, std::string password);
   ~Server();
-  size_t getUsersSize(void);
 
   // nigel
   void createServer(void);
-  void makeUser(void);
-  void readMessage(User &user);
-  void sendMessage(User &user, std::string message);
-  void userLoopCheck(void);
-  User *findUserByFd(int fd);
-  void getClientMessage(int client_fd);
+  void userLoopCheck();
   void putServerBanner(void);
-  void addNewClient(epoll_event &user_ev, int epfd);
   std::string putClientBanner(void);
-
-  void sendMessageAll(std::string message);
-
-  void timeStamp(void);
-
-  // parsing commands
-  void clientInputCommand(int clientFD, std::string &inputClient);
-  void pong(int clientFd, std::string input);
-  void clientQuits(int fd, User &user);
-  std::string trimUserName(std::string &userName);
-  std::string extractClientData(std::string &input, std::string strFind);
-  int checkLeadingHash(int clientFd, std::string &input);
-  void putErrorMessage(int clientFd, std::string &input, std::string errorMsg,
-                       int code);
-  std::string extractRealName(std::string &realName);
-  std::string putWelcomeMessage(User *user);
-
-  void cap(int clientFd, std::string &inputClient, User *user);
-  int sendCommand(int clientFd, std::string input);
-
-  void nick(int clientFd, std::string &inputClient, User *user);
-  int nickCommand(int clientFd, std::string input);
-
-  void join(int clientFd, std::string &inputClient, User *user);
-
-  int checkForSpaces(int clientFd, std::string &input);
-
-  int initClientsNames(int clientFd, std::string &inputClient, User &user);
-
-  std::vector<User *> users_;
-  std::vector<Channel *> channels_;
 
 private:
   int port_;
@@ -143,6 +104,7 @@ private:
   void handleTopic(int client_fd, const Command &command);
   void handleKick(int client_fd, const Command &command);
   void handleInvite(int client_fd, const Command &command);
+  void handleCap(int client_fd, const Command &command);
   void handleUnknownCommand(int client_fd, const Command &command);
 
   // Utility functions
