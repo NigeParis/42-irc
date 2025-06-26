@@ -13,24 +13,10 @@
 #include "../include/server.hpp"
 
 Server::Server(int port, std::string password)
-    : port_(port), password_(password), lastClientToWrite_(0) {
-        // std::cout << "constructor" << " port: "<< port << " PW: " << password
-        // << std::endl;
-      };
+    : port_(port), password_(password), lastClientToWrite_(0) {};
 
 Server::~Server() {
-
   std::cout << BLUE << "[DEBUG] - destructor Server" << RESET << std::endl;
-
-  for (size_t i = 0; i < users_.size(); ++i) {
-    delete users_[i];
-  }
-  users_.clear();
-
-  // for (size_t i = 0; i < channels_.size(); ++i) {
-  //     delete channels_[i];
-  // }
-  // channels_.clear();
 
   close(this->socket_);
 };
@@ -46,153 +32,31 @@ void Server::createServer(void) {
   addressServer.sin_family = AF_INET;
   addressServer.sin_addr.s_addr = INADDR_ANY;
   addressServer.sin_port = htons(this->port_);
-  bind(this->socket_, (struct sockaddr *)&addressServer, sizeof(addressServer));
+  if (bind(this->socket_, (struct sockaddr *)&addressServer,
+           sizeof(addressServer)) < 0) {
+    std::cout << "Error: binding socket" << std::endl;
+    close(this->socket_);
+    exit(EXIT_FAILURE);
+  }
   listen(this->socket_, 10);
   putServerBanner();
 };
 
-void Server::makeUser(void) {
-
-  struct sockaddr_in client_addr;
-  socklen_t client_addr_len = sizeof(client_addr);
-
-  int clientFd =
-      accept(socket_, (struct sockaddr *)&client_addr, &client_addr_len);
-  if (clientFd == -1) {
-    std::cout << "Error: creating client FD" << std::endl;
-    SigHandler::sigloop = false;
-    return;
-  }
-  fcntl(clientFd, F_SETFL, O_NONBLOCK);
-  User *user = new User(clientFd, POLLIN, 0);
-  users_.push_back(user);
-  std::string name = user->getNickName(); // default name
-  user->setNickName(name);
-  Server::timeStamp();
-  std::cout << BLUE << "[LOGIN]     " << RESET << "<" << GREEN
-            << std::setfill(' ') << std::setw(8) << user->getNickName() << RESET
-            << ">" << " Just arrived " << std::endl;
-}
-
-void Server::clientQuits(int fd, User &user) {
-
-  std::vector<User *>::iterator it =
-      std::find(users_.begin(), users_.end(), &user);
-  Server::timeStamp();
-  std::cout << BLUE << "[LOGOUT]    " << RESET << "<" << GREEN
-            << std::setfill(' ') << std::setw(8) << user.getNickName() << RESET
-            << ">" << " Just left " << std::endl;
-  this->lastClientToWrite_ = 0;
-  close(fd);
-  delete &user;
-  if (it != users_.end()) {
-    users_.erase(it);
-    Server::timeStamp();
-    std::cout << YELLOW << "[CLIENTS]   " << RESET << "<" << std::setfill(' ')
-              << std::setw(7) << YELLOW << "active" << RESET << "> "
-              << users_.size() << std::endl;
-  }
-};
-
-void Server::readMessage(User &user) {
-
-  std::string buffer(BUFFER, '\0');
-  static int checkfd;
-
-  int fd = user.getUserFd();
-  ssize_t bytes_read = recv(user.getUserFd(), &buffer[0], buffer.size() - 1, 0);
-  if ((bytes_read == 0) || SigHandler::sigloop == false) {
-    clientQuits(fd, user);
-    return;
-  }
-  if (bytes_read == -1) {
-    std::cout << "error recv()" << std::endl;
-    return;
-  }
-  if (buffer[0] == '\r')
-    return;
-  else if (bytes_read != -1) {
-    if (bytes_read && lastClientToWrite_ != user.getUserFd() &&
-        buffer[0] != '\r') {
-      Server::timeStamp();
-      std::cout << RED << "[MESSAGE]   " << RESET << "<" << GREEN
-                << std::setfill(' ') << std::setw(8) << user.getNickName()
-                << RESET << "> ";
-    }
-    checkfd = user.getUserFd();
-    std::cout << buffer;
-
-    clientInputCommand(user.getUserFd(),
-                       buffer); // commands recieved from client
-
-    if (buffer[bytes_read - 2] == '\r')
-      this->lastClientToWrite_ = 0;
-    else
-      this->lastClientToWrite_ = checkfd;
-  }
-};
-
-void Server::getClientMessage(int client_fd) {
-
-  User *user = findUserByFd(client_fd);
-  if (user != NULL) {
-    readMessage(*user);
-  }
-};
-
-void Server::addNewClient(epoll_event &user_ev, int epfd) {
-
-  std::string message;
-  makeUser();
-  if (SigHandler::sigloop == false)
-    return;
-
-  user_ev.events = EPOLLIN;
-  user_ev.data.fd = users_.back()->user_pollfd.fd;
-  epoll_ctl(epfd, EPOLL_CTL_ADD, users_.back()->user_pollfd.fd, &user_ev);
-  Server::timeStamp();
-  std::cout << YELLOW << "[CLIENTS]   " << RESET << "<" << std::setfill(' ')
-            << std::setw(7) << YELLOW << "active" << RESET << "> "
-            << users_.size() << std::endl;
-};
-
-// void cleanupChannels() {
-
-// for (size_t y = 0; y < this->channels_.size(); ++y) {
-//         for (size_t i = 0; i < this->channels_[y]->channelmembre_.size();
-//         ++i) {
-//             delete this->channels_[y]->channelmembre_[i];
-//         }
-//         for (size_t i = 0; i < this->channels_[y]->channelInvited_.size();
-//         ++i) {
-//             delete this->channels_[y]->channelInvited_[i];
-//         }
-//         for (size_t i = 0; i < this->channels_[y]->channelBoss_.size(); ++i)
-//         {
-//             delete this->channels_[y]->channelBoss_[i];
-//         }
-//     }
-
-// }
-
 void Server::userLoopCheck() {
 
   epoll_event events[BUFFER];
-  struct epoll_event ev;
-  struct epoll_event user_ev;
 
   int epfd = epoll_create1(0);
   if (epfd == -1) {
     perror("epoll_create failed");
     return;
   }
+
+  struct epoll_event ev;
   ev.events = EPOLLIN;
   ev.data.fd = this->socket_;
   epoll_ctl(epfd, EPOLL_CTL_ADD, this->socket_, &ev);
   while (SigHandler::sigloop) {
-    if (!SigHandler::sigloop)
-      break;
-
     int num_events = epoll_wait(epfd, events, 10, 1000);
     if (num_events < 0) {
       if (!SigHandler::sigloop)
@@ -202,10 +66,10 @@ void Server::userLoopCheck() {
     for (int i = 0; i < num_events; ++i) {
       int fd = events[i].data.fd;
       if (fd == this->socket_ && (events[i].events & EPOLLIN)) {
-        addNewClient(user_ev, epfd);
+        acceptNewClient(epfd);
       } else if (events[i].events & EPOLLIN) {
         if ((events[i].events & (EPOLLERR | EPOLLHUP)) == 0) {
-          getClientMessage(fd);
+          handleClientMessage(fd);
         }
       }
     }
@@ -216,16 +80,132 @@ void Server::userLoopCheck() {
   close(epfd);
 }
 
-// Helper functions
-
-User *Server::findUserByFd(int fd) {
-  for (size_t i = 0; i < users_.size(); i++) {
-    if (users_[i]->getUserFd() == fd) {
-      return users_[i];
-    }
+void Server::acceptNewClient(int epfd) {
+  struct sockaddr_in clientAddress;
+  socklen_t clientAddressLength = sizeof(clientAddress);
+  int client_fd = accept(this->socket_, (struct sockaddr *)&clientAddress,
+                         &clientAddressLength);
+  if (client_fd < 0) {
+    perror("accept failed");
+    return;
   }
-  return NULL;
+
+  if (!setNonBlocking(client_fd)) {
+    close(client_fd);
+    return;
+  }
+
+  struct epoll_event user_ev;
+  user_ev.events = EPOLLIN;
+  user_ev.data.fd = client_fd;
+  if (epoll_ctl(epfd, EPOLL_CTL_ADD, client_fd, &user_ev) < 0) {
+    perror("epoll_ctl failed");
+    close(client_fd);
+    return;
+  }
+
+  clients[client_fd] = new Client(client_fd);
+
+  std::cout << GREEN << "[DEBUG] - new client connected: " << client_fd << RESET
+            << std::endl;
+}
+
+void Server::handleClientMessage(int client_fd) {
+  if (clients.find(client_fd) == clients.end()) {
+    std::cout << RED << "[ERROR] - client not found: " << client_fd << RESET
+              << std::endl;
+    return;
+  }
+
+  char buffer[BUFFER];
+  memset(buffer, 0, BUFFER);
+  ssize_t bytes_read = recv(client_fd, buffer, BUFFER - 1, 0);
+  if (bytes_read <= 0) {
+    perror("recv failed");
+    return;
+  }
+  buffer[bytes_read] = '\0';
+  Client *client = clients[client_fd];
+  client->buffer += buffer;
+  if (client->buffer.substr(client->buffer.size() - 2) != "\r\n") {
+    return;
+  }
+
+  Command command = parseCommand(client->buffer);
+
+  if (command.name == "PING")
+    handlePing(client_fd, command);
+  else if (command.name == "PONG")
+    handlePong(client_fd, command);
+  else if (command.name == "NICK")
+    handleNick(client_fd, command);
+  else if (command.name == "USER")
+    handleUser(client_fd, command);
+  else if (command.name == "PASS")
+    handlePass(client_fd, command);
+  else if (command.name == "JOIN")
+    handleJoin(client_fd, command);
+  else if (command.name == "PART")
+    handlePart(client_fd, command);
+  else if (command.name == "PRIVMSG")
+    handlePrivmsg(client_fd, command);
+  else if (command.name == "MODE")
+    handleMode(client_fd, command);
+  else if (command.name == "TOPIC")
+    handleTopic(client_fd, command);
+  else if (command.name == "KICK")
+    handleKick(client_fd, command);
+  else if (command.name == "INVITE")
+    handleInvite(client_fd, command);
+  else if (command.name == "QUIT")
+    handleQuit(client_fd, command);
+  else
+    putErrorMessage(client_fd, command.name, "Unknown command", 421);
+}
+
+std::string Server::buildResponse(const Command &command, User *user) {
+  return "hello world";
 };
+
+void Server::sendResponse(int client_fd, const std::string &response) {
+  if (clients.find(client_fd) == clients.end()) {
+    std::cout << RED << "[ERROR] - client not found: " << client_fd << RESET
+              << std::endl;
+    return;
+  }
+  Client *client = clients[client_fd];
+  ssize_t bytes_sent = send(client_fd, response.c_str(), response.size(), 0);
+  if (bytes_sent <= 0) {
+    perror("send failed");
+    return;
+  }
+  client->buffer.clear();
+}
+
+void Server::broadcastResponse(const std::string &message,
+                               const std::vector<int> &client_fds) {
+  for (int i = 0; i < client_fds.size(); ++i) {
+    sendResponse(client_fds[i], message);
+  }
+}
+
+bool Server::setNonBlocking(int fd) {
+  if (fcntl(fd, F_SETFL, O_NONBLOCK) == -1) {
+    perror("fcntl O_NONBLOCK failed");
+    return false;
+  }
+  return true;
+}
+
+std::string Server::getCurrentTime() {
+  std::time_t now = std::time(NULL);
+  std::tm *localTime = std::localtime(&now);
+
+  char buffer[80];
+  std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", localTime);
+
+  return std::string(buffer);
+}
 
 void Server::putServerBanner(void) {
 
@@ -274,18 +254,6 @@ std::string Server::putClientBanner(void) {
   ss << "══════════════════════════════════════════════════════════════════ \n";
 
   return (ss.str());
-};
-
-void Server::sendMessage(User &user, std::string message) {
-
-  if (user.getUserFd() > -1 && !message.empty())
-    sendCommand(user.getUserFd(), message);
-};
-
-void Server::sendMessageAll(std::string message) {
-
-  for (size_t i = 0; i < users_.size(); i++)
-    sendCommand(users_[i]->getUserFd(), message);
 };
 
 void Server::timeStamp(void) {

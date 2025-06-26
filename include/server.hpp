@@ -16,6 +16,7 @@
 #include <cstring>
 #include <fcntl.h>
 #include <iostream>
+#include <map>
 #include <netinet/in.h>
 #include <poll.h>
 #include <signal.h>
@@ -32,9 +33,11 @@
 #include <sstream>
 #include <sys/epoll.h>
 
+#include "Channel.hpp"
+#include "Client.hpp"
 #include "SigHandler.hpp"
 #include "parsing.hpp"
-#include "user.hpp"
+/*#include "user.hpp"*/
 
 #define RED "\033[31m"
 #define BLUE "\033[34m"
@@ -47,8 +50,16 @@
 
 #define BUFFER 1024
 
+struct Command {
+  std::string prefix;
+  std::string name;
+  std::vector<std::string> params;
+  std::string trailing;
+};
+
 class User;
 class Channel;
+class Client;
 
 class Server {
 
@@ -57,6 +68,7 @@ public:
   ~Server();
   size_t getUsersSize(void);
 
+  // nigel
   void createServer(void);
   void makeUser(void);
   void readMessage(User &user);
@@ -104,4 +116,35 @@ private:
   int socket_;
   std::string password_;
   int lastClientToWrite_;
+  std::map<int, Client *> clients;
+  std::map<std::string, Channel *> channels;
+
+  void acceptNewClient(int epfd);
+  void handleClientMessage(int client_fd);
+  void disconnectClient(int client_fd);
+
+  Command parseCommand(const std::string &input);
+  std::string buildResponse(const Command &command, User *user);
+  void sendResponse(int client_fd, const std::string &response);
+  void broadcastResponse(const std::string &message,
+                         const std::vector<int> &client_fds);
+
+  // commands
+  void handlePing(int client_fd, const Command &command);
+  void handlePong(int client_fd, const Command &command);
+  void handleNick(int client_fd, const Command &command);
+  void handleJoin(int client_fd, const Command &command);
+  void handlePart(int client_fd, const Command &command);
+  void handlePrivmsg(int client_fd, const Command &command);
+  void handleQuit(int client_fd, const Command &command);
+  void handlePass(int client_fd, const Command &command);
+  void handleUser(int client_fd, const Command &command);
+  void handleMode(int client_fd, const Command &command);
+  void handleTopic(int client_fd, const Command &command);
+  void handleKick(int client_fd, const Command &command);
+  void handleInvite(int client_fd, const Command &command);
+
+  // Utility functions
+  std::string getCurrentTime();
+  bool setNonBlocking(int fd);
 };
