@@ -202,11 +202,20 @@ void Server::topic(int clientFd, std::string &inputClient, User *user) {
     
 };
 
+int Server::findByChannelName(std::string name) {
+    for (size_t i = 0; i < channels_.size(); i++) {
+        if (channels_[i]->getChannelName() == name)
+            return i;
+    }
+    return -1; // Not found
+}
+
 
 
 
 
 void Server::join(int clientFd, std::string &inputClient, User *user) {
+
     std::string channel = extractClientData(inputClient, "JOIN ");
     std::string nick = user->getNickName();
     std::string serverName = "localhost";
@@ -241,8 +250,10 @@ void Server::join(int clientFd, std::string &inputClient, User *user) {
     std::cout << BLUE << "[DEBUG] - channelName: " << newChannel->getChannelName() << RESET << std::endl;
     std::cout << BLUE << "[DEBUG] - channelPassword: " << newChannel->getChannelPassword() << RESET << std::endl;
     std::cout << BLUE << "[DEBUG] - channelTopic: " << newChannel->getChannelTopic() << RESET << std::endl;
-
+    
     this->channels_.push_back(newChannel);
+    std::cout << YELLOW << "[DEBUG] - channelSize: " << this->channels_.size() << RESET << std::endl;
+    std::cout << YELLOW << "[DEBUG] - channelSize: " << this->channels_[findByChannelName(channel)]->getChannelName() << RESET << std::endl;
 
 }
 
@@ -264,11 +275,10 @@ void Server::cap(int clientFd, std::string &inputClient, User *user) {
     
     std::string welcomeMessage = putWelcomeMessage(user);
     std::string nickName = extractClientData(inputClient, "NICK ");   
-    std::string userName = extractClientData(inputClient, "USER ");    std::cout << "Channel Destructor" << std::endl;
+    std::string userName = extractClientData(inputClient, "USER ");
 
     bool nameDoubleFlag = false;
     userName = trimUserName(userName);
-
     if (inputClient.substr(4, 2) == "LS") {
         sendCommand(clientFd, "CAP * LS :\r\n");
         sendCommand(clientFd, welcomeMessage);
@@ -307,13 +317,25 @@ int Server::nickCommand(int clientFd, std::string input) {
     
     std::string message;
     User *user = findUserByFd(clientFd);
-    
-    if(checkLeadingHash(clientFd, input))
+
+    std::cout << YELLOW << "[DEBUG] - " << input << RESET << std::endl;
+
+    if (user->getNickName().empty() || input.empty()) {
+        putErrorMessage(clientFd, input, " :No nickname given", 431);        
         return (1);
-    if (checkForSpaces(clientFd, input))
+    }
+    if(checkLeadingHash(clientFd, input)) {
+        std::cout << YELLOW << "[DEBUG] - checkLeadHash()" << input << RESET << std::endl;
         return (1);
-    if (input == user->getNickName())
-        return (0);     
+    }
+    if (checkForSpaces(clientFd, input)) {
+        std::cout << YELLOW << "[DEBUG] - checkForSpaces()" << input << RESET << std::endl;
+        return (1);
+    }
+    if (input == user->getNickName()) {
+        std::cout << YELLOW << "[DEBUG] - input == nickName" << input << RESET << std::endl;
+        return (0);
+    }
     message = ":" + user->getNickName();
     message += " NICK " + input;
     message += "\r\n";

@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/22 09:38:41 by nrobinso          #+#    #+#             */
-/*   Updated: 2025/06/22 09:54:56 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/26 13:52:38 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,9 @@ int Server::checkForSpaces(int clientFd, std::string &input) {
 
     User *user = findUserByFd(clientFd);
     
-    if (input.empty()) {
-        return (1);
-    }
+    // if (input.empty()) {
+    //     return (1);
+    // }
     for (std::string::iterator it = input.begin(); it < input.end(); it++) {
         if (*it == ' ') {
             std::string errorMessage = "Error " + user->getNickName() + " " + input + " :Erroneus nickname";
@@ -62,10 +62,6 @@ std::string extractChannel(std::string &topic) {
 
 int Server::checkLeadingHash(int clientFd, std::string &input) {
     
-    if (input.empty()) {
-        putErrorMessage(clientFd, input, " :No nickname given", 431);        
-        return (1);
-    }
     if ((*input.begin() == '#') || (*input.begin() == ':')) {
         putErrorMessage(clientFd, input, " :Erroneus nickname", 432);
         return(1);

@@ -6,7 +6,7 @@
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:08 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/22 09:49:40 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/06/26 15:44:13 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,6 +99,7 @@ class Server {
 
 
         std::vector<Channel*>::iterator findTopicByChannelName(std::string  name);
+        int findByChannelName(std::string name);
 
         
 
