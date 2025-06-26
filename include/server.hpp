@@ -124,7 +124,7 @@ private:
   void disconnectClient(int client_fd);
 
   Command parseCommand(const std::string &input);
-  std::string buildResponse(const Command &command, User *user);
+  std::string buildMessage(const Command &command);
   void sendResponse(int client_fd, const std::string &response);
   void broadcastResponse(const std::string &message,
                          const std::vector<int> &client_fds);
@@ -143,6 +143,7 @@ private:
   void handleTopic(int client_fd, const Command &command);
   void handleKick(int client_fd, const Command &command);
   void handleInvite(int client_fd, const Command &command);
+  void handleUnknownCommand(int client_fd, const Command &command);
 
   // Utility functions
   std::string getCurrentTime();

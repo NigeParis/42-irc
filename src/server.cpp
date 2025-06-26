@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "../include/server.hpp"
+#include <sstream>
 
 Server::Server(int port, std::string password)
     : port_(port), password_(password), lastClientToWrite_(0) {};
@@ -160,12 +161,69 @@ void Server::handleClientMessage(int client_fd) {
   else if (command.name == "QUIT")
     handleQuit(client_fd, command);
   else
-    putErrorMessage(client_fd, command.name, "Unknown command", 421);
+    handleUnknownCommand(client_fd, command);
 }
 
-std::string Server::buildResponse(const Command &command, User *user) {
-  return "hello world";
-};
+void Server::disconnectClient(int client_fd) {
+  if (clients.find(client_fd) == clients.end()) {
+    std::cout << RED << "[ERROR] - client not found: " << client_fd << RESET
+              << std::endl;
+    return;
+  }
+  close(client_fd);
+  delete clients[client_fd];
+  clients.erase(client_fd);
+  std::cout << RED << "[DEBUG] - client disconnected: " << client_fd << RESET
+            << std::endl;
+}
+
+Command Server::parseCommand(const std::string &input) {
+  Command command;
+  std::istringstream iss(input);
+  std::string token;
+
+  if (input[0] == ':') {
+    iss >> token;
+    command.prefix = token.substr(1);
+  }
+
+  iss >> command.name;
+
+  while (iss >> token) {
+    if (token[0] == ':') {
+      command.trailing = token.substr(1);
+      std::string word;
+      while (iss >> word) {
+        command.trailing += " " + word;
+      }
+      break;
+    }
+    command.params.push_back(token);
+  }
+  return command;
+}
+
+std::string Server::buildMessage(const Command &cmd) {
+  std::ostringstream oss;
+
+  if (!cmd.prefix.empty()) {
+    oss << ":" << cmd.prefix << " ";
+  }
+
+  oss << cmd.name;
+
+  for (size_t i = 0; i < cmd.params.size(); ++i) {
+    oss << " " << cmd.params[i];
+  }
+
+  if (!cmd.trailing.empty()) {
+    oss << " :" << cmd.trailing;
+  }
+
+  oss << "\r\n";
+
+  return oss.str();
+}
 
 void Server::sendResponse(int client_fd, const std::string &response) {
   if (clients.find(client_fd) == clients.end()) {
