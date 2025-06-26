@@ -19,10 +19,8 @@ Server::Server(int port, std::string password)
     : port_(port), password_(password), lastClientToWrite_(0) {};
 
 Server::~Server() {
-  std::cout << BLUE << "[DEBUG] - destructor Server" << RESET << std::endl;
 
   close(this->socket_);
-  // TODO: correctly cleanupUsers();
   for (std::map<int, Client *>::iterator it = clients.begin();
        it != clients.end(); ++it) {
     close(it->first);
@@ -35,8 +33,6 @@ Server::~Server() {
     delete it->second;
   }
   channels.clear();
-
-  // TODO: cleanupChannels();
 };
 
 void Server::createServer(void) {
@@ -122,15 +118,10 @@ void Server::acceptNewClient(int epfd) {
 
   lastClientToWrite_++;
   clients[client_fd] = new Client(client_fd, lastClientToWrite_);
-
-  std::cout << GREEN << "[DEBUG] - new client connected: " << client_fd << RESET
-            << std::endl;
 }
 
 void Server::handleClientMessage(int client_fd) {
   if (clients.find(client_fd) == clients.end()) {
-    std::cout << RED << "[ERROR] - client not found: " << client_fd << RESET
-              << std::endl;
     return;
   }
 
@@ -142,8 +133,6 @@ void Server::handleClientMessage(int client_fd) {
     return;
   }
   if (bytes_read == 0) {
-    std::cout << RED << "[DEBUG] - client disconnected: " << client_fd << RESET
-              << std::endl;
     disconnectClient(client_fd);
     return;
   }
@@ -155,26 +144,14 @@ void Server::handleClientMessage(int client_fd) {
     return;
   }
 
-  std::cout << BLUE
-            << "[DEBUG] - received message from client: " << client->buffer
-            << RESET << std::endl;
-  std::cout << "==================================" << std::endl;
-
   std::vector<std::string> commands = split(client->buffer, "\r\n");
   client->buffer.clear();
 
-  for (size_t i = 0; i < commands.size() - 1; ++i) {
-
+  for (size_t i = 0; i < commands.size(); ++i) {
     Command command = parseCommand(commands[i]);
-    std::cout << GREEN << "[DEBUG] - command received: " << command.name
-              << RESET << std::endl;
 
-    if (command.name == "PING")
-      handlePing(client_fd, command);
-    else if (command.name == "CAP")
+    if (command.name == "CAP")
       handleCap(client_fd, command);
-    else if (command.name == "PONG")
-      handlePong(client_fd, command);
     else if (command.name == "NICK")
       handleNick(client_fd, command);
     else if (command.name == "USER")
@@ -195,8 +172,6 @@ void Server::handleClientMessage(int client_fd) {
       handleKick(client_fd, command);
     else if (command.name == "INVITE")
       handleInvite(client_fd, command);
-    else if (command.name == "QUIT")
-      handleQuit(client_fd, command);
     else
       handleUnknownCommand(client_fd, command);
   }
@@ -204,15 +179,11 @@ void Server::handleClientMessage(int client_fd) {
 
 void Server::disconnectClient(int client_fd) {
   if (clients.find(client_fd) == clients.end()) {
-    std::cout << RED << "[ERROR] - client not found: " << client_fd << RESET
-              << std::endl;
     return;
   }
   close(client_fd);
   delete clients[client_fd];
   clients.erase(client_fd);
-  std::cout << RED << "[DEBUG] - client disconnected: " << client_fd << RESET
-            << std::endl;
 }
 
 Command Server::parseCommand(const std::string &input) {
@@ -241,141 +212,11 @@ Command Server::parseCommand(const std::string &input) {
   return command;
 }
 
-void Server::handlePing(int client_fd, const Command &command) {
-  (void)command;   // Unused parameter
-  (void)client_fd; // Unused parameter
-}
-
 void Server::handleCap(int client_fd, const Command &command) {
-  std::cout << BLUE << "[DEBUG] - case: CAP " << command.params[0] << RESET
-            << std::endl;
   if (command.params[0] != "LS")
     return;
-  std::cout << "==================================" << std::endl;
 
   sendResponse(client_fd, "CAP * LS \r\n");
-}
-
-void Server::handlePong(int client_fd, const Command &command) {
-  (void)command;   // Unused parameter
-  (void)client_fd; // Unused parameter
-  std::cout << BLUE << "[DEBUG] - case: PONG" << RESET << std::endl;
-  std::cout << "params: ";
-  for (size_t i = 0; i < command.params.size(); ++i) {
-    std::cout << command.params[i] << " ";
-  };
-  std::cout << std::endl;
-  std::cout << "==================================" << std::endl;
-}
-
-void Server::handleNick(int client_fd, const Command &command) {
-  Client *client = clients[client_fd];
-  Command cmd;
-  cmd.prefix = "ircserv";
-
-  if (command.params.size() < 1) {
-    cmd.name = "431";
-    cmd.params.push_back(client->nickname);
-    cmd.trailing = "No nickname given";
-    std::string response = buildMessage(cmd);
-    sendResponse(client_fd, response);
-    return;
-  }
-
-  if (!isValidNickname(command.params[0])) {
-    cmd.name = "432";
-    cmd.params.push_back(client->nickname);
-    cmd.trailing = "Erroneous nickname";
-    std::string response = buildMessage(cmd);
-    sendResponse(client_fd, response);
-    return;
-  }
-
-  if (!isAvailableNickname(command.params[0])) {
-    cmd.name = "433";
-    cmd.params.push_back(client->nickname);
-    cmd.trailing = "Nickname is already in use";
-    std::string response = buildMessage(cmd);
-    sendResponse(client_fd, response);
-    return;
-  }
-  cmd.prefix = client->nickname + client->username + "@" + client->hostname;
-  cmd.name = "NICK";
-  cmd.trailing = command.params[0];
-  std::string response = buildMessage(cmd);
-  client->nickname = command.params[0];
-
-  std::set<int> client_fds = getChannelsClientList(client_fd);
-  broadcastResponse(response,
-                    std::vector<int>(client_fds.begin(), client_fds.end()));
-
-  std::cout << GREEN
-            << "[DEBUG] - client changed nickname to: " << command.params[0]
-            << RESET << std::endl;
-}
-
-void Server::handleJoin(int client_fd, const Command &command) {
-  (void)command;   // Unused parameter
-  (void)client_fd; // Unused parameter
-}
-
-void Server::handlePart(int client_fd, const Command &command) {
-  (void)command;   // Unused parameter
-  (void)client_fd; // Unused parameter
-}
-
-void Server::handlePrivmsg(int client_fd, const Command &command) {
-  (void)command;   // Unused parameter
-  (void)client_fd; // Unused parameter
-}
-
-void Server::handleQuit(int client_fd, const Command &command) {
-  (void)command; // Unused parameter
-  std::cout << BLUE << "[DEBUG] - case: QUIT" << RESET << std::endl;
-  disconnectClient(client_fd);
-}
-
-void Server::handlePass(int client_fd, const Command &command) {
-
-  Client *client = clients[client_fd];
-  Command cmd;
-  cmd.prefix = "ircserv";
-  cmd.params.push_back(client->nickname);
-
-  if (client->is_authenticated) {
-
-    cmd.name = "462";
-    cmd.trailing = "You may not reregister";
-    std::string response = buildMessage(cmd);
-    sendResponse(client_fd, response);
-    disconnectClient(client_fd);
-    return;
-  }
-  if (command.params.size() < 1) {
-    cmd.name = "461";
-    cmd.trailing = "Not enough parameters";
-    std::string response = buildMessage(cmd);
-    sendResponse(client_fd, response);
-    return;
-  }
-  if (command.params[0] != password_) {
-    cmd.name = "464";
-    cmd.trailing = "Password incorrect";
-    std::string response = buildMessage(cmd);
-    sendResponse(client_fd, response);
-    disconnectClient(client_fd);
-    return;
-  }
-
-  std::cout << BLUE << "[DEBUG] client reregistered succesfully" << RESET
-            << std::endl;
-  client->is_authenticated = true;
-  return;
-}
-
-void Server::handleUser(int client_fd, const Command &command) {
-  (void)command;   // Unused parameter
-  (void)client_fd; // Unused parameter
 }
 
 void Server::handleMode(int client_fd, const Command &command) {
@@ -403,40 +244,9 @@ void Server::handleUnknownCommand(int client_fd, const Command &command) {
   sendResponse(client_fd, response);
 }
 
-bool Server::isAvailableNickname(const std::string &nickname) {
-  for (std::map<int, Client *>::iterator it = clients.begin();
-       it != clients.end(); ++it) {
-    if (it->second->nickname == nickname) {
-      return false;
-    }
-  }
-  return true;
-}
-
-bool Server::isValidNickname(const std::string &nickname) {
-  if (nickname.empty())
-    return false;
-
-  if (std::isdigit(nickname[0]))
-    return false;
-
-  if (nickname[0] == '#' || nickname[0] == ':' ||
-      nickname.find(' ') != std::string::npos)
-    return false;
-
-  for (size_t i = 0; i < nickname.length(); ++i) {
-    char c = nickname[i];
-    if (!std::isalnum(c) && c != '[' && c != ']' && c != '{' && c != '}' &&
-        c != '\\' && c != '|' && c != '-' && c != '_') {
-      return false;
-    }
-  }
-
-  return true;
-}
-
 std::set<int> Server::getChannelsClientList(int client_fd) {
   std::set<int> client_fds;
+  client_fds.insert(client_fd);
 
   for (std::map<std::string, Channel *>::iterator it = channels.begin();
        it != channels.end(); ++it) {
@@ -473,8 +283,6 @@ std::string Server::buildMessage(const Command &cmd) {
 
 void Server::sendResponse(int client_fd, const std::string &response) {
   if (clients.find(client_fd) == clients.end()) {
-    std::cout << RED << "[ERROR] - client not found: " << client_fd << RESET
-              << std::endl;
     return;
   }
   Client *client = clients[client_fd];
@@ -542,20 +350,4 @@ void Server::putServerBanner(void) {
   std::cout << "═══════════════════════════════════════════════════════════════"
                "════════ "
             << std::endl;
-};
-
-std::string Server::putClientBanner(void) {
-
-  std::stringstream ss;
-
-  ss << "██╗██████╗  ██████╗     ██████╗██╗     ██╗███████╗███╗   ██╗████████╗ "
-        "\n";
-  ss << "██║██╔══██╗██╔════╝    ██╔════╝██║     ██║██╔════╝████╗  ██║╚══██╔══╝ "
-        "\n";
-  ss << "██║██████╔╝██║         ██║     ██║     ██║█████╗  ██╔██╗ ██║   ██║ \n";
-  ss << "██║██╔══██╗██║         ██║     ██║     ██║██╔══╝  ██║╚██╗██║   ██║ \n";
-  ss << "██║██║  ██║╚██████╗    ╚██████╗███████╗██║███████╗██║ ╚████║   ██║ \n";
-  ss << "══════════════════════════════════════════════════════════════════ \n";
-
-  return (ss.str());
 };

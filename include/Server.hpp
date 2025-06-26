@@ -113,4 +113,5 @@ private:
   bool isAvailableNickname(const std::string &nickname);
   bool isValidNickname(const std::string &nickname);
   std::set<int> getChannelsClientList(int client_fd);
+  void sendWelcomeMessage(int client_fd);
 };

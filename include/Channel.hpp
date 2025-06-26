@@ -17,7 +17,7 @@ public:
   std::string password;
   bool isInviteOnly;
   bool topicRestricted;
-  bool isSecret;
+  bool isPrivate;
   int userLimit;
 
   Channel(const std::string &channel_name);
