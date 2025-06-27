@@ -25,6 +25,8 @@ public:
   void addUser(Client &user);
   void removeUser(int user_fd);
   bool hasUser(int user_fd) const;
+  bool isWhiteListed(int user_fd) const;
+  bool verifyPassword(const std::string &password) const;
 
   std::vector<int> getClientFds();
   // Getters

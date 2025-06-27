@@ -85,7 +85,9 @@ private:
   void disconnectClient(int client_fd);
 
   Command parseCommand(const std::string &input);
-  std::string buildMessage(const Command &command);
+  std::string buildMessage(const std::string &prefix, const std::string &name,
+                           const std::vector<std::string> &params,
+                           const std::string &trailing = "");
   void sendResponse(int client_fd, const std::string &response);
   void broadcastResponse(const std::string &message,
                          const std::vector<int> &client_fds);

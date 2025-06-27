@@ -36,3 +36,20 @@ std::vector<int> Channel::getClientFds() {
   }
   return client_fds;
 }
+
+bool Channel::isWhiteListed(int user_fd) const {
+  if (!isInviteOnly)
+    return true;
+
+  if (invitedUsers.find(user_fd) != invitedUsers.end())
+    return true;
+
+  return false;
+}
+
+bool Channel::verifyPassword(const std::string &password) const {
+  if (!isPrivate)
+    return true;
+
+  return this->password == password;
+}

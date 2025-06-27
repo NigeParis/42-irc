@@ -149,6 +149,8 @@ void Server::handleClientMessage(int client_fd) {
 
   for (size_t i = 0; i < commands.size(); ++i) {
     Command command = parseCommand(commands[i]);
+    std::cout << "Received command: " << commands[i]
+              << " from client fd: " << client_fd << std::endl;
 
     if (command.name == "CAP")
       handleCap(client_fd, command);
@@ -259,21 +261,24 @@ std::set<int> Server::getChannelsClientList(int client_fd) {
   return client_fds;
 }
 
-std::string Server::buildMessage(const Command &cmd) {
+std::string Server::buildMessage(const std::string &prefix,
+                                 const std::string &name,
+                                 const std::vector<std::string> &params,
+                                 const std::string &trailing = "") {
   std::ostringstream oss;
 
-  if (!cmd.prefix.empty()) {
-    oss << ":" << cmd.prefix << " ";
+  if (!prefix.empty()) {
+    oss << ":" << prefix << " ";
   }
 
-  oss << cmd.name;
+  oss << name;
 
-  for (size_t i = 0; i < cmd.params.size(); ++i) {
-    oss << " " << cmd.params[i];
+  for (size_t i = 0; i < params.size(); ++i) {
+    oss << " " << params[i];
   }
 
-  if (!cmd.trailing.empty()) {
-    oss << " :" << cmd.trailing;
+  if (!trailing.empty()) {
+    oss << " :" << trailing;
   }
 
   oss << "\r\n";
