@@ -1,42 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parsing.hpp                                        :+:      :+:    :+:   */
+/*   SigHandler.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/15 14:02:07 by nrobinso          #+#    #+#             */
-/*   Updated: 2025/06/20 15:48:46 by nrobinso         ###   ########.fr       */
+/*   Created: 2025/06/11 17:01:48 by nrobinso          #+#    #+#             */
+/*   Updated: 2025/06/11 17:42:43 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma once
-
-#include "server.hpp"
+#include "../../include/SigHandler.hpp"
 #include <iostream>
-#include <string>
 
-enum keyWord {
+bool SigHandler::sigloop = true;
 
-  PING,
-  CAP,
-  NICK,
-  MODE,
-  QUIT,
-  WHOIS,
-  JOIN,
-  PRIVMSG,
-  USER,
-  PASS,
-  TOPIC,
-  INVITE,
-  KICK,
-  ERROR,
-  PART
-};
+SigHandler::SigHandler(void) {};
+SigHandler::~SigHandler(void) {};
 
-struct keyWordInput {
-  keyWord value;
-};
-
-keyWordInput getKeyWord(std::string &inputClient, size_t start, size_t end);
+void SigHandler::handleStop(int signal) {
+  std::cout << "\nkill triggered" << std::endl;
+  if (signal == SIGINT) {
+    std::cout << "killing process" << std::endl;
+    SigHandler::sigloop = false;
+  }
+}
