@@ -5,6 +5,14 @@ void Server::handleJoin(int client_fd, const Command &command) {
     return;
   }
 
+  if (!clients[client_fd]->is_authenticated) {
+    std::string response = buildMessage("ircserv", "451", 
+                                       std::vector<std::string>(1, clients[client_fd]->nickname), 
+                                       "You have not registered");
+    sendResponse(client_fd, response);
+    return;
+  }
+
   std::vector<std::string> params;
   params.push_back(clients[client_fd]->nickname);
 

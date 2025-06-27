@@ -117,4 +117,7 @@ private:
   std::set<int> getChannelsClientList(int client_fd);
   void sendWelcomeMessage(int client_fd);
   void sendWelcomeJoinMessage(int client_fd, const std::string &channel_name);
+  void handleChannelMessage(int client_fd, const std::string &target, const std::string &message);
+  void handlePrivateMessage(int client_fd, const std::string &target, const std::string &message);
+  int findClientByNickname(const std::string &nickname);
 };

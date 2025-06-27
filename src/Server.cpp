@@ -316,6 +316,15 @@ bool Server::setNonBlocking(int fd) {
   return true;
 }
 
+int Server::findClientByNickname(const std::string &nickname) {
+  for (std::map<int, Client *>::iterator it = clients.begin(); it != clients.end(); ++it) {
+    if (it->second->nickname == nickname) {
+      return it->first;
+    }
+  }
+  return -1;  
+}
+
 std::string Server::getCurrentTime() {
   std::time_t now = std::time(NULL);
   std::tm *localTime = std::localtime(&now);
