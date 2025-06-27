@@ -7,10 +7,10 @@ Channel::Channel(const std::string &channel_name)
 void Channel::setTopic(const std::string &new_topic) { topic = new_topic; }
 std::string Channel::getTopic() const { return topic; }
 
-void Channel::addUser(Client &user) {
-  users[user.socket_fd] = &user;
+void Channel::addUser(Client *user) {
+  users[user->socket_fd] = user;
   if (operators.empty()) {
-    operators.insert(user.socket_fd);
+    operators.insert(user->socket_fd);
   }
 }
 
@@ -52,4 +52,8 @@ bool Channel::verifyPassword(const std::string &password) const {
     return true;
 
   return this->password == password;
+}
+
+bool Channel::isOperator(int client_fd) const {
+  return operators.find(client_fd) != operators.end();
 }

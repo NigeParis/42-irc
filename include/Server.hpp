@@ -87,7 +87,7 @@ private:
   Command parseCommand(const std::string &input);
   std::string buildMessage(const std::string &prefix, const std::string &name,
                            const std::vector<std::string> &params,
-                           const std::string &trailing = "");
+                           const std::string &trailing);
   void sendResponse(int client_fd, const std::string &response);
   void broadcastResponse(const std::string &message,
                          const std::vector<int> &client_fds);
@@ -116,4 +116,5 @@ private:
   bool isValidNickname(const std::string &nickname);
   std::set<int> getChannelsClientList(int client_fd);
   void sendWelcomeMessage(int client_fd);
+  void sendWelcomeJoinMessage(int client_fd, const std::string &channel_name);
 };

@@ -3,7 +3,8 @@
 void Server::handlePass(int client_fd, const Command &command) {
 
   Client *client = clients[client_fd];
-  std::vector<std::string> params = {client->nickname};
+  std::vector<std::string> params;
+  params.push_back(client->nickname);
 
   if (client->is_authenticated) {
 

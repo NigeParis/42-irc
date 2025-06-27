@@ -22,7 +22,7 @@ public:
 
   Channel(const std::string &channel_name);
   void setTopic(const std::string &new_topic);
-  void addUser(Client &user);
+  void addUser(Client *user);
   void removeUser(int user_fd);
   bool hasUser(int user_fd) const;
   bool isWhiteListed(int user_fd) const;
@@ -31,4 +31,6 @@ public:
   std::vector<int> getClientFds();
   // Getters
   std::string getTopic() const;
+  bool isOperator(int client_fd) const;
+  
 };

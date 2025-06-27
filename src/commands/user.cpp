@@ -6,22 +6,20 @@ void Server::handleUser(int client_fd, const Command &command) {
   }
 
   Client *client = clients[client_fd];
-  Command cmd;
-  cmd.prefix = "ircserv";
 
   if (client->username != "default" || client->hostname != "default") {
-    cmd.name = "462";
-    cmd.trailing = "You may not reregister";
-    std::string response = buildMessage(cmd);
+    std::string response = buildMessage("ircserv", "462",
+                                       std::vector<std::string>(),
+                                       "You may not reregister");
     sendResponse(client_fd, response);
     disconnectClient(client_fd);
     return;
   }
 
   if (command.params.size() < 3) {
-    cmd.name = "461";
-    cmd.trailing = "Not enough parameters";
-    std::string response = buildMessage(cmd);
+    std::string response = buildMessage("ircserv", "461",
+                                       std::vector<std::string>(),
+                                       "Not enough parameters");
     sendResponse(client_fd, response);
     return;
   }
@@ -35,34 +33,27 @@ void Server::sendWelcomeMessage(int client_fd) {
   Client *client = clients[client_fd];
   std::string nick = client->nickname;
 
-  Command cmd;
-  cmd.prefix = "ircserv";
-  cmd.params.push_back(nick);
-
   // 001 - Welcome + bannière
-  cmd.name = "001";
-  cmd.trailing = "Welcome to the IRC Network " + nick + "!" + client->username +
-                 "@" + client->hostname + "\n" + putClientBanner();
-  sendResponse(client_fd, buildMessage(cmd));
+  std::vector<std::string> params;
+  params.push_back(nick);
+  std::string welcome_msg = "Welcome to the IRC Network " + nick + "!" + client->username +
+                           "@" + client->hostname + "\n" + putClientBanner();
+  sendResponse(client_fd, buildMessage("ircserv", "001", params, welcome_msg));
 
   // 002 - Host info
-  cmd.name = "002";
-  cmd.trailing = "Your host is ircserv, running version 1.0";
-  sendResponse(client_fd, buildMessage(cmd));
+  sendResponse(client_fd, buildMessage("ircserv", "002", params, "Your host is ircserv, running version 1.0"));
 
   // 003 - Server creation time
-  cmd.name = "003";
-  cmd.trailing = "This server was created " + getCurrentTime();
-  sendResponse(client_fd, buildMessage(cmd));
+  sendResponse(client_fd, buildMessage("ircserv", "003", params, "This server was created " + getCurrentTime()));
 
   // 004 - Server version & modes
-  cmd.name = "004";
-  cmd.params.push_back("ircserv");
-  cmd.params.push_back("1.0");
-  cmd.params.push_back("o");
-  cmd.params.push_back("o");
-  cmd.trailing.clear();
-  sendResponse(client_fd, buildMessage(cmd));
+  std::vector<std::string> server_params;
+  server_params.push_back(nick);
+  server_params.push_back("ircserv");
+  server_params.push_back("1.0");
+  server_params.push_back("o");
+  server_params.push_back("o");
+  sendResponse(client_fd, buildMessage("ircserv", "004", server_params, ""));
 }
 
 std::string Server::putClientBanner(void) {

@@ -6,49 +6,43 @@ void Server::handleNick(int client_fd, const Command &command) {
   }
 
   Client *client = clients[client_fd];
-  Command cmd;
-  cmd.prefix = "ircserv";
 
   if (!client->is_authenticated) {
-    cmd.name = "451";
-    cmd.params.push_back(client->nickname);
-    cmd.trailing = "You have not registered";
-    std::string response = buildMessage(cmd);
+    std::string response = buildMessage("ircserv", "451", 
+                                       std::vector<std::string>(1, client->nickname), 
+                                       "You have not registered");
     sendResponse(client_fd, response);
     return;
   }
 
   if (command.params.size() < 1) {
-    cmd.name = "431";
-    cmd.params.push_back(client->nickname);
-    cmd.trailing = "No nickname given";
-    std::string response = buildMessage(cmd);
+    std::string response = buildMessage("ircserv", "431", 
+                                       std::vector<std::string>(1, client->nickname), 
+                                       "No nickname given");
     sendResponse(client_fd, response);
     return;
   }
 
   if (!isValidNickname(command.params[0])) {
-    cmd.name = "432";
-    cmd.params.push_back(client->nickname);
-    cmd.trailing = "Erroneous nickname";
-    std::string response = buildMessage(cmd);
+    std::string response = buildMessage("ircserv", "432", 
+                                       std::vector<std::string>(1, client->nickname), 
+                                       "Erroneous nickname");
     sendResponse(client_fd, response);
     return;
   }
 
   if (!isAvailableNickname(command.params[0])) {
-    cmd.name = "433";
-    cmd.params.push_back(client->nickname);
-    cmd.trailing = "Nickname is already in use";
-    std::string response = buildMessage(cmd);
+    std::string response = buildMessage("ircserv", "433", 
+                                       std::vector<std::string>(1, client->nickname), 
+                                       "Nickname is already in use");
     sendResponse(client_fd, response);
     return;
   }
-  cmd.prefix =
-      client->nickname + "!" + client->username + "@" + client->hostname;
-  cmd.name = "NICK";
-  cmd.trailing = command.params[0];
-  std::string response = buildMessage(cmd);
+
+  std::string prefix = client->nickname + "!" + client->username + "@" + client->hostname;
+  std::string response = buildMessage(prefix, "NICK", 
+                                     std::vector<std::string>(), 
+                                     command.params[0]);
   client->nickname = command.params[0];
 
   std::cout << "Client " << client_fd << " changed nickname to "
