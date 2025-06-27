@@ -57,3 +57,19 @@ bool Channel::verifyPassword(const std::string &password) const {
 bool Channel::isOperator(int client_fd) const {
   return operators.find(client_fd) != operators.end();
 }
+
+void Channel::removeUserFromOperators(int user_fd) {
+  operators.erase(user_fd);
+}
+
+void Channel::addUserToOperators(int user_fd) {
+  operators.insert(user_fd);
+}
+
+void Channel::removeUserFromInvitedUsers(int user_fd) {
+  invitedUsers.erase(user_fd);
+}
+
+void Channel::addUserToInvitedUsers(int user_fd) {
+  invitedUsers.insert(user_fd);
+}

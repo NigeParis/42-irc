@@ -162,6 +162,8 @@ void Server::handleClientMessage(int client_fd) {
       handlePass(client_fd, command);
     else if (command.name == "JOIN")
       handleJoin(client_fd, command);
+    else if (command.name == "QUIT")
+      handleQuit(client_fd, command);
     else if (command.name == "PART")
       handlePart(client_fd, command);
     else if (command.name == "PRIVMSG")

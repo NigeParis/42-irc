@@ -27,10 +27,15 @@ public:
   bool hasUser(int user_fd) const;
   bool isWhiteListed(int user_fd) const;
   bool verifyPassword(const std::string &password) const;
+  void removeUserFromOperators(int user_fd);
+  void addUserToOperators(int user_fd);
+  void removeUserFromInvitedUsers(int user_fd);
+  void addUserToInvitedUsers(int user_fd);
 
   std::vector<int> getClientFds();
   // Getters
   std::string getTopic() const;
   bool isOperator(int client_fd) const;
+
   
 };

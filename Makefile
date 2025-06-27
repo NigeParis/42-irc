@@ -17,6 +17,8 @@ SRC = main.cpp \
 			commands/Channel.cpp \
 			commands/invite.cpp \
 			commands/join.cpp \
+			commands/quit.cpp \
+			commands/kick.cpp \
 			commands/mode.cpp \
 			commands/nick.cpp \
 			commands/part.cpp \
