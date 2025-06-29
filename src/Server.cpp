@@ -223,21 +223,6 @@ void Server::handleCap(int client_fd, const Command &command) {
   sendResponse(client_fd, "CAP * LS \r\n");
 }
 
-void Server::handleMode(int client_fd, const Command &command) {
-  (void)command;   // Unused parameter
-  (void)client_fd; // Unused parameter
-}
-
-
-void Server::handleKick(int client_fd, const Command &command) {
-  (void)command;   // Unused parameter
-  (void)client_fd; // Unused parameter
-}
-
-void Server::handleInvite(int client_fd, const Command &command) {
-  (void)command;   // Unused parameter
-  (void)client_fd; // Unused parameter
-}
 
 void Server::handleUnknownCommand(int client_fd, const Command &command) {
   std::string response = "Unknown command: " + command.name + "\r\n";
