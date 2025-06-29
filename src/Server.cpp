@@ -228,10 +228,6 @@ void Server::handleMode(int client_fd, const Command &command) {
   (void)client_fd; // Unused parameter
 }
 
-void Server::handleTopic(int client_fd, const Command &command) {
-  (void)command;   // Unused parameter
-  (void)client_fd; // Unused parameter
-}
 
 void Server::handleKick(int client_fd, const Command &command) {
   (void)command;   // Unused parameter

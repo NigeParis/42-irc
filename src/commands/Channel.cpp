@@ -1,7 +1,7 @@
 #include "../../include/Channel.hpp"
 
 Channel::Channel(const std::string &channel_name)
-    : name(channel_name), isInviteOnly(false), topicRestricted(false),
+    : name(channel_name), topicSetBy(""), topicSetTime(""), isInviteOnly(false), topicRestricted(false),
       isPrivate(false), userLimit(-1) {}
 
 void Channel::setTopic(const std::string &new_topic) { topic = new_topic; }

@@ -15,6 +15,8 @@ private:
 public:
   std::string name;
   std::string password;
+  std::string topicSetBy;
+  std::string topicSetTime;
   bool isInviteOnly;
   bool topicRestricted;
   bool isPrivate;

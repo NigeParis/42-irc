@@ -120,4 +120,6 @@ private:
   void handleChannelMessage(int client_fd, const std::string &target, const std::string &message);
   void handlePrivateMessage(int client_fd, const std::string &target, const std::string &message);
   int findClientByNickname(const std::string &nickname);
+  void viewTopic(int client_fd, const std::string &channel_name);
+  void changeTopic(int client_fd, const std::string &channel_name, const std::string &new_topic);
 };
