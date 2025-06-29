@@ -114,6 +114,7 @@ private:
   bool setNonBlocking(int fd);
   bool isAvailableNickname(const std::string &nickname);
   bool isValidNickname(const std::string &nickname);
+  bool isChannelExists(const std::string &channel_name);
   std::set<int> getChannelsClientList(int client_fd);
   void sendWelcomeMessage(int client_fd);
   void sendWelcomeJoinMessage(int client_fd, const std::string &channel_name);
@@ -122,4 +123,6 @@ private:
   int findClientByNickname(const std::string &nickname);
   void viewTopic(int client_fd, const std::string &channel_name);
   void changeTopic(int client_fd, const std::string &channel_name, const std::string &new_topic);
+  void listInvites(int client_fd);
+  void sendInvite(int client_fd, const std::string &target_nickname, const std::string &channel_name);
 };

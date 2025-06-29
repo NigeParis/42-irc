@@ -68,3 +68,7 @@ void Channel::removeUserFromInvitedUsers(int user_fd) {
 void Channel::addUserToInvitedUsers(int user_fd) {
   invitedUsers.insert(user_fd);
 }
+
+bool Channel::isInvited(int user_fd) const {
+  return invitedUsers.find(user_fd) != invitedUsers.end();
+}

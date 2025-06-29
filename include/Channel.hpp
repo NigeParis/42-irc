@@ -33,6 +33,7 @@ public:
   void addUserToOperators(int user_fd);
   void removeUserFromInvitedUsers(int user_fd);
   void addUserToInvitedUsers(int user_fd);
+  bool isInvited(int user_fd) const;
 
   std::vector<int> getClientFds();
   // Getters

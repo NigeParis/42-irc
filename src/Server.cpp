@@ -223,7 +223,6 @@ void Server::handleCap(int client_fd, const Command &command) {
   sendResponse(client_fd, "CAP * LS \r\n");
 }
 
-
 void Server::handleUnknownCommand(int client_fd, const Command &command) {
   std::string response = "Unknown command: " + command.name + "\r\n";
   sendResponse(client_fd, response);
@@ -242,6 +241,10 @@ std::set<int> Server::getChannelsClientList(int client_fd) {
     }
   }
   return client_fds;
+}
+
+bool Server::isChannelExists(const std::string &channel_name) {
+  return channels.find(channel_name) != channels.end();
 }
 
 std::string Server::buildMessage(const std::string &prefix,
