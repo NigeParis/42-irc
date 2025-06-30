@@ -41,7 +41,7 @@ void Server::handleJoin(int client_fd, const Command &command) {
   }
 
   if (channels.find(command.params[0]) == channels.end()) {
-    channels[command.params[0]] = new Channel(command.params[0]);
+    channels[command.params[0]] = new Channel(command.params[0], getCurrentTime());
   }
 
   Channel *channel = channels[command.params[0]];

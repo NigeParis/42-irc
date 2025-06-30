@@ -1,8 +1,8 @@
 #include "../../include/Channel.hpp"
 
-Channel::Channel(const std::string &channel_name)
+Channel::Channel(const std::string &channel_name, const std::string &creation_time)
     : name(channel_name), topicSetBy(""), topicSetTime(""), isInviteOnly(false), topicRestricted(false),
-      isPrivate(false), userLimit(-1) {}
+      isPrivate(false), userLimit(-1), creationTime(creation_time) {}
 
 void Channel::setTopic(const std::string &new_topic) { topic = new_topic; }
 std::string Channel::getTopic() const { return topic; }

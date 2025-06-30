@@ -125,4 +125,8 @@ private:
   void changeTopic(int client_fd, const std::string &channel_name, const std::string &new_topic);
   void listInvites(int client_fd);
   void sendInvite(int client_fd, const std::string &target_nickname, const std::string &channel_name);
+  void sendCurrentChannelModes(int client_fd, const std::string &channel_name);
+  void applyModeChanges(int client_fd, const std::string &channel_name, 
+                       const std::string &modestring, 
+                       const std::vector<std::string> &mode_params);
 };

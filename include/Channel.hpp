@@ -21,8 +21,9 @@ public:
   bool topicRestricted;
   bool isPrivate;
   int userLimit;
+  std::string creationTime;
 
-  Channel(const std::string &channel_name);
+  Channel(const std::string &channel_name, const std::string &creation_time);
   void setTopic(const std::string &new_topic);
   void addUser(Client *user);
   void removeUser(int user_fd);
