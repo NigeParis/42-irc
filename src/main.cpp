@@ -19,8 +19,11 @@ int main(int argc, char *argv[]) {
     std::cout << "Error: ./ircserv <port> <password>" << std::endl;
     return (1);
   }
-  std::cout << "hello world" << std::endl;
   signal(SIGINT, SigHandler::handleStop);
+  if (atoi(argv[1]) < 1024 || atoi(argv[1]) > 65535) {
+    std::cerr << "Error: Port number must be between 1024 and 65535." << std::endl;
+    return (1);
+  }
   Server server(atoi(argv[1]), argv[2]);
   server.createServer();
   server.userLoopCheck();
