@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   server.cpp                                         :+:      :+:    :+:   */
+/*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 21:54:04 by nige42            #+#    #+#             */
-/*   Updated: 2025/06/21 11:17:33 by nrobinso         ###   ########.fr       */
+/*   Updated: 2025/07/02 15:07:04 by nrobinso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -351,7 +351,7 @@ void Server::putServerBanner(void) {
   std::cout << "server listening on port: " << this->port_ << std::endl;
   std::cout << "server password: " << this->password_ << std::endl;
   std::cout << std::endl;
-  std::cout << YELLOW << "Users connected: " << clients.size() << RESET
+  std::cout << YELLOW << "Server log: " << RESET
             << std::endl;
   std::cout << "═══════════════════════════════════════════════════════════════"
                "════════ "
