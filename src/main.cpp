@@ -10,20 +10,20 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/server.hpp"
+#include "../include/Server.hpp"
+#include <iostream>
 
 int main(int argc, char *argv[]) {
-    
-    if (argc != 3) {
-        std::cout << "Error: ./ircserv <port> <password>" << std::endl;
-        return(1);
-    }
-    signal(SIGINT, SigHandler::handleStop);
-    Server server(atoi(argv[1]), argv[2]);
-    server.createServer(); 
-    server.userLoopCheck();
 
+  if (argc != 3) {
+    std::cout << "Error: ./ircserv <port> <password>" << std::endl;
+    return (1);
+  }
+  std::cout << "hello world" << std::endl;
+  signal(SIGINT, SigHandler::handleStop);
+  Server server(atoi(argv[1]), argv[2]);
+  server.createServer();
+  server.userLoopCheck();
 
-    
-    return 0;
+  return 0;
 }
