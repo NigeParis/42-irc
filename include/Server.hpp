@@ -98,6 +98,7 @@ private:
   void handleJoin(int client_fd, const Command &command);
   void handlePart(int client_fd, const Command &command);
   void handlePrivmsg(int client_fd, const Command &command);
+  void handleNotice(int client_fd, const Command &command);
   void handleQuit(int client_fd, const Command &command);
   void handlePass(int client_fd, const Command &command);
   void handleUser(int client_fd, const Command &command);
@@ -125,6 +126,8 @@ private:
   void sendWelcomeJoinMessage(int client_fd, const std::string &channel_name);
   void handleChannelMessage(int client_fd, const std::string &target, const std::string &message);
   void handlePrivateMessage(int client_fd, const std::string &target, const std::string &message);
+  void handleChannelNotice(int client_fd, const std::string &target, const std::string &message);
+  void handlePrivateNotice(int client_fd, const std::string &target, const std::string &message);
   int findClientByNickname(const std::string &nickname);
   void viewTopic(int client_fd, const std::string &channel_name);
   void changeTopic(int client_fd, const std::string &channel_name, const std::string &new_topic);

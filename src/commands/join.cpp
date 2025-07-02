@@ -16,14 +16,6 @@ void Server::handleJoin(int client_fd, const Command &command) {
   std::vector<std::string> params;
   params.push_back(clients[client_fd]->nickname);
 
-  if (!clients[client_fd]->is_authenticated) {
-    std::string response = buildMessage("ircserv", "451", 
-                                       std::vector<std::string>(1, clients[client_fd]->nickname), 
-                                       "You have not registered");
-    sendResponse(client_fd, response);
-    return;
-  }
-
   if (command.params.empty() || command.params.size() < 1 ||  command.params[0].empty()) {
     std::string response = buildMessage("ircserv", "461", 
                                        std::vector<std::string>(1, clients[client_fd]->nickname), 

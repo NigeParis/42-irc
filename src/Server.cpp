@@ -168,6 +168,8 @@ void Server::handleClientMessage(int client_fd) {
       handlePart(client_fd, command);
     else if (command.name == "PRIVMSG")
       handlePrivmsg(client_fd, command);
+    else if (command.name == "NOTICE")
+      handleNotice(client_fd, command);
     else if (command.name == "MODE")
       handleMode(client_fd, command);
     else if (command.name == "TOPIC")

@@ -29,6 +29,7 @@ SRC = main.cpp \
 			commands/quoteBot.cpp \
 			commands/Quote.cpp \
 			commands/ping.cpp \
+			commands/notice.cpp \
 
 
 
