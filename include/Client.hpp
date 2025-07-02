@@ -4,6 +4,9 @@
 #include <iostream>
 #include <string>
 #include <unistd.h>
+#include "Quote.hpp"
+
+class Quote;
 
 class Client {
 
@@ -14,6 +17,7 @@ public:
   std::string hostname;
   bool is_authenticated;
   std::string buffer;
+  Quote quote;
 
   Client(int fd, int guest_number);
   ~Client();

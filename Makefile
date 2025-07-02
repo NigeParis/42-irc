@@ -26,6 +26,9 @@ SRC = main.cpp \
 			commands/privmsg.cpp \
 			commands/topic.cpp \
 			commands/user.cpp \
+			commands/quoteBot.cpp \
+			commands/Quote.cpp \
+			commands/ping.cpp \
 
 
 

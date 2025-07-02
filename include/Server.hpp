@@ -94,7 +94,6 @@ private:
 
   // commands
   void handlePing(int client_fd, const Command &command);
-  void handlePong(int client_fd, const Command &command);
   void handleNick(int client_fd, const Command &command);
   void handleJoin(int client_fd, const Command &command);
   void handlePart(int client_fd, const Command &command);
@@ -107,6 +106,11 @@ private:
   void handleKick(int client_fd, const Command &command);
   void handleInvite(int client_fd, const Command &command);
   void handleCap(int client_fd, const Command &command);
+  void handleQuote(int client_fd, const Command &command);
+  void getQuote(int client_fd);
+  void setQuote(int client_fd, const Command &command);
+  void removeQuote(int client_fd, const Command &command);
+  void listQuotes(int client_fd);
   std::string formatFileSize(long bytes);
   void handleUnknownCommand(int client_fd, const Command &command);
 

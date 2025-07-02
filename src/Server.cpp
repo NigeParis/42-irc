@@ -176,6 +176,10 @@ void Server::handleClientMessage(int client_fd) {
       handleKick(client_fd, command);
     else if (command.name == "INVITE")
       handleInvite(client_fd, command);
+    else if (command.name == "PING")
+      handlePing(client_fd, command);
+    else if (command.name == "bot")
+      handleQuote(client_fd, command);
     else
       handleUnknownCommand(client_fd, command);
   }
