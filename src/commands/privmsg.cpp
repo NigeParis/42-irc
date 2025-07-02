@@ -32,6 +32,7 @@ void Server::handlePrivmsg(int client_fd, const Command &command) {
   }
 
   std::string target = command.params[0];
+  
 
   if (target[0] == '#') {
     handleChannelMessage(client_fd, target, command.trailing);

@@ -107,6 +107,7 @@ private:
   void handleKick(int client_fd, const Command &command);
   void handleInvite(int client_fd, const Command &command);
   void handleCap(int client_fd, const Command &command);
+  std::string formatFileSize(long bytes);
   void handleUnknownCommand(int client_fd, const Command &command);
 
   // Utility functions
