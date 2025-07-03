@@ -22,13 +22,10 @@ This project helped us become more confident with network programming and collab
 ## Connection and Setup
 
 - `/connect <server>`  
-  Connect to an IRC server (e.g., `/connect irc.libera.chat`)
+  Connect to an our IRC server (e.g., `/connect localhost <port> <password>`)
 
 - `/disconnect`  
   Disconnect from the current server
-
-- `/server add <name> <host> <port>`  
-  Add a server to your saved list for easier access
 
 - `/nick <nickname>`  
   Change your nickname
@@ -75,13 +72,3 @@ This project helped us become more confident with network programming and collab
 - `/window close` or `/wc`  
   Close the current window
 
-## Help and Info
-
-- `/help`  
-  Display available Irssi commands
-
-- `/help <command>`  
-  Get help for a specific command (e.g., `/help join`)
-
-- `/whois <nick>`  
-  Get information about a user on the network
