@@ -74,10 +74,10 @@ Both `irssi` and `nc` (Netcat) can be used to interact with IRC servers, but the
 
 ```bash
 
-| Tool   | Command Style           | Description                                      |
-|--------|--------------------------|--------------------------------------------------|
-| `irssi` | Slash-prefixed commands | Commands start with `/` (e.g., `/join`, `/msg`)  |
-| `nc`    | Raw IRC protocol lines  | You type raw IRC commands manually (e.g., `NICK`, `USER`) |
+| Tool    | Command Style            | Description                                               |
+|---------|--------------------------|-----------------------------------------------------------|
+| `irssi` | Slash-prefixed commands  | Commands start with `/` (e.g., `/join`, `/msg`)           |
+| `nc`    | Raw IRC protocol lines   | You type raw IRC commands manually (e.g., `NICK`, `USER`) |
 
 ---
 ```
@@ -85,7 +85,7 @@ Both `irssi` and `nc` (Netcat) can be used to interact with IRC servers, but the
 
 ```bash
 | Task              | `irssi` Command                          | `nc` Command Example                      |
-|-------------------|-------------------------------------------|-------------------------------------------|
+|-------------------|------------------------------------------|-------------------------------------------|
 | Connect to server | `/connect irc.example.com`               | `nc -C irc.example.com 6667`              |
 | Set nickname      | `/nick myname`                           | `NICK myname` (typed manually)            |
 | Register user     | `/user myname myhost myserver :Real Name`| `USER myname myhost myserver :Real Name`  |
