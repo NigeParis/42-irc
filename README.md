@@ -127,18 +127,18 @@ Use `irssi` for convenience and productivity. Use `nc` when you want to debug or
 ```bash
 /quote bot
 ```
-### → Affiche une blague aléatoire depuis la collection du bot
+### → "Displays a random joke from the bot’s collection.
 ```bash
 /quote bot set Pourquoi les canards n’aiment-ils pas les grenouilles ? Parce qu’elles les cuassent !
 ```
-### → Ajoute une nouvelle blague à la collection
+### → Adds a new joke to the collection.
 ```bash
 /quote bot remove :2
 ```
-### → Supprime la blague à l’index 1 (les indices commencent à 0)
+### → Removes the joke at index 1 (indexes start at 0).
 
 
-## File Transfer Between Clients — DCC Command Examples
+## File Transfer Between irssi Clients — /dcc Command Examples
 
 As part of the bonus feature, we implemented file transfers using the `/dcc` command. This allows clients to send and receive files directly, bypassing the IRC server.
 ### Sending a File
