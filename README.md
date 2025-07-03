@@ -124,18 +124,18 @@ Use `irssi` for convenience and productivity. Use `nc` when you want to debug or
 
 ### Quote Bot  (bonus) — Command Examples
 
+### → "Displays a random joke from the bot’s collection.
 ```bash
 /quote bot
 ```
-### → "Displays a random joke from the bot’s collection.
+### → Adds a new joke to the collection.
 ```bash
 /quote bot set Pourquoi les canards n’aiment-ils pas les grenouilles ? Parce qu’elles les cuassent !
 ```
-### → Adds a new joke to the collection.
+### → Removes the joke at index 1 (indexes start at 0).
 ```bash
 /quote bot remove :2
 ```
-### → Removes the joke at index 1 (indexes start at 0).
 
 
 ## File Transfer Between irssi Clients — /dcc Command Examples
