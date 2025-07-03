@@ -35,63 +35,7 @@ When you enter `irssi` in the terminal:
 ```bash
 irssi
 
-
-
-# Basic Irssi Commands
-
-## Connection and Setup
-
-- `/connect <server>`  
-  Connect to an our IRC server (e.g., `/connect localhost <port> <password>`)
-
-- `/disconnect`  
-  Disconnect from the current server
-
-- `/nick <nickname>`  
-  Change your nickname
-
-- `/quit [message]`  
-  Leave Irssi with an optional quit message
-
-## Channel Management
-
-- `/join #channel`  
-  Join a specific channel (e.g., `/join #myproject`)
-
-- `/part [#channel] [message]`  
-  Leave a channel with an optional parting message
-
-- `/topic <new topic>`  
-  Set or change the topic of the current channel
-
-- `/names`  
-  List users currently in the channel
-
-## Messaging
-
-- `/msg <nick> <message>`  
-  Send a private message to a specific user
-
-- `/me <action>`  
-  Send an action (e.g., `/me laughs` → *yourname laughs*)
-
-- `/notice <nick> <message>`  
-  Send a notice (less intrusive than a regular message)
-
-## Navigation
-
-- `Alt + <number>`  
-  Switch to a specific Irssi window (Alt+2 = Window 2)
-
-- `Ctrl + N` / `Ctrl + P`  
-  Move to the next or previous window
-
-- `/window list`  
-  Show all open windows and their activity
-
-- `/window close` or `/wc`  
-  Close the current window
-
+```
 
 ## Connecting to Our IRC Server Using `nc`
 
