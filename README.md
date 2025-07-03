@@ -104,9 +104,10 @@ nc -C localhost 6100
 PASS <password>
 NICK nickname
 USER nige nigehost localhost :Niel Robertson
-
+```
 ## Breakdown of the `USER` Command Components
 
+```bash
 | Part               | Description                                                                 |
 |--------------------|-----------------------------------------------------------------------------|
 | `USER`             | IRC command used to register the user after connecting to the server        |
@@ -117,7 +118,6 @@ USER nige nigehost localhost :Niel Robertson
 
 ```
 
-```bash
 
 # Difference in Commands Between `irssi` and `nc`
 
@@ -125,25 +125,30 @@ Both `irssi` and `nc` (Netcat) can be used to interact with IRC servers, but the
 
 ## 1. Interface Style
 
+```bash
+
 | Tool   | Command Style           | Description                                      |
 |--------|--------------------------|--------------------------------------------------|
 | `irssi` | Slash-prefixed commands | Commands start with `/` (e.g., `/join`, `/msg`)  |
 | `nc`    | Raw IRC protocol lines  | You type raw IRC commands manually (e.g., `NICK`, `USER`) |
 
 ---
-
+```
 ## 2. Connecting to a Server
 
+```bash
 | Task              | `irssi` Command                          | `nc` Command Example                      |
 |-------------------|-------------------------------------------|-------------------------------------------|
 | Connect to server | `/connect irc.example.com`               | `nc -C irc.example.com 6667`              |
 | Set nickname      | `/nick myname`                           | `NICK myname` (typed manually)            |
 | Register user     | `/user myname myhost myserver :Real Name`| `USER myname myhost myserver :Real Name`  |
 
+```
 ---
 
 ## 3. Joining and Messaging
 
+```bash
 | Task               | `irssi` Command         | `nc` Raw Command                  |
 |--------------------|--------------------------|-----------------------------------|
 | Join a channel     | `/join #channel`         | `JOIN #channel`                   |
@@ -152,15 +157,16 @@ Both `irssi` and `nc` (Netcat) can be used to interact with IRC servers, but the
 | Quit IRC           | `/quit`                  | `QUIT :Goodbye`                   |
 
 ---
-
+```
 ## 4. Navigation and Extras
 
+```bash
 | Feature            | `irssi`                  | `nc`                              |
 |--------------------|--------------------------|-----------------------------------|
 | Switch windows     | `Alt + number`           | Not applicable                    |
 | View user list     | `/names`                 | `NAMES #channel`                  |
 | Help               | `/help`                  | Not available                     |
-
+```
 ---
 
 ## Summary
@@ -169,4 +175,3 @@ Both `irssi` and `nc` (Netcat) can be used to interact with IRC servers, but the
 - **`nc`** is a low-level tool that sends raw text over TCP. You must manually type every IRC protocol command.
 
 Use `irssi` for convenience and productivity. Use `nc` when you want to debug or test your server at the protocol level.
-```
