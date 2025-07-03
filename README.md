@@ -90,8 +90,8 @@ Both `irssi` and `nc` (Netcat) can be used to interact with IRC servers, but the
 | Set nickname      | `/nick myname`                           | `NICK myname` (typed manually)            |
 | Register user     | `/user myname myhost myserver :Real Name`| `USER myname myhost myserver :Real Name`  |
 
-```
 ---
+```
 
 ### 3. Joining and Messaging
 
