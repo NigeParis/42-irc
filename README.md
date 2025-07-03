@@ -91,3 +91,29 @@ irssi
 
 - `/window close` or `/wc`  
   Close the current window
+
+
+## Connecting to Our IRC Server Using `nc`
+
+During development and testing, we used the `nc` (Netcat) command-line tool to connect to our IRC server from the terminal. It provided a quick and lightweight way to manually interact with the server and send IRC commands without the need for a full client.
+
+### Example Command
+
+```bash
+nc -C localhost 6100
+PASS <password>
+NICK nickname
+USER nige nigehost localhost :Niel Robertson
+
+## Breakdown of the `USER` Command Components
+
+| Part               | Description                                                                 |
+|--------------------|-----------------------------------------------------------------------------|
+| `USER`             | IRC command used to register the user after connecting to the server        |
+| `nige`             | Username (also called ident)                                                 |
+| `nigehost`         | Hostname, which may be a placeholder or ignored by some IRC servers          |
+| `localhost`        | Server name—often unused or set to `*` in practice                          |
+| `:Niel Robertson`  | Real name (GECOS field); the colon is required to allow spaces in the text  |
+
+```
+
