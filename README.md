@@ -47,8 +47,8 @@ During development and testing, we used the `nc` (Netcat) command-line tool to c
 ```bash
 nc -C localhost 6100
 PASS <password>
-NICK nickname
-USER nige nigehost localhost :Niel Robertson
+NICK <nickname>
+USER <nige> <nigehost> <localhost> :<Niel Robertson>
 ```
 ### Breakdown of the `USER` Command Components
 
@@ -59,7 +59,7 @@ USER nige nigehost localhost :Niel Robertson
 | `nige`             | Username (also called ident)                                                 |
 | `nigehost`         | Hostname, which may be a placeholder or ignored by some IRC servers          |
 | `localhost`        | Server name—often unused or set to `*` in practice                          |
-| `:Niel Robertson`  | Real name (GECOS field); the colon is required to allow spaces in the text  |
+| `:Niel Robertson`  | Real name (GECOS field): the colon is required to allow spaces in the text  |
 
 ```
 
@@ -164,7 +164,7 @@ As part of the bonus feature, we implemented file transfers using the `/dcc` com
 ### connecting on my server from another computer
 
 ```bash
-//find the ip address of the server a terminal bash
+//find the ip address of the server in a terminal bash
 hostname -I
 10.16.4.9  192.168.122.1  172.17.0.1 
 ```
