@@ -30,18 +30,19 @@ When you enter `irssi` in the terminal:
 - You can begin entering IRC commands like `/connect` or `/join`.
 - It allows real-time chatting in channels or via private messages.
 
-## Basic Usage Examples
+## Basic Usage of irssi client command Examples
 
 ```bash
 irssi
 
+/connect localhost 6100 password
 ```
 
 ## Connecting to Our IRC Server Using `nc`
 
 During development and testing, we used the `nc` (Netcat) command-line tool to connect to our IRC server from the terminal. It provided a quick and lightweight way to manually interact with the server and send IRC commands without the need for a full client.
 
-### Example Command
+### Example using nc Command
 
 ```bash
 nc -C localhost 6100
