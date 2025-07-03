@@ -32,7 +32,7 @@ When you enter `irssi` in the terminal:
 
 ### Basic Usage connecting using irssi client command 
 
-```bash
+```rust
 irssi
 
 /connect localhost <6100> <password>
@@ -44,7 +44,7 @@ During development and testing, we used the `nc` (Netcat) command-line tool to c
 
 ### Example connecting using nc Command
 
-```bash
+```rust
 // -C optiion = Send CRLF('\r\n') as line-ending.
 
 nc -C localhost 6100
@@ -54,7 +54,7 @@ USER <nige> <nigehost> <localhost> :<Niel Robertson>
 ```
 ### Breakdown of the `USER` Command Components
 
-```bash
+```rust
 | Part               | Description                                                                 |
 |--------------------|-----------------------------------------------------------------------------|
 | `USER`             | IRC command used to register the user after connecting to the server        |
@@ -72,7 +72,7 @@ Both `irssi` and `nc` (Netcat) can be used to interact with IRC servers, but the
 
 ### 1. Interface Style
 
-```bash
+```rust
 
 | Tool    | Command Style            | Description                                               |
 |---------|--------------------------|-----------------------------------------------------------|
@@ -83,7 +83,7 @@ Both `irssi` and `nc` (Netcat) can be used to interact with IRC servers, but the
 ```
 ### 2. Connecting to a Server
 
-```bash
+```rust
 | Task              | `irssi` Command                          | `nc` Command Example                      |
 |-------------------|------------------------------------------|-------------------------------------------|
 | Connect to server | `/connect irc.example.com`               | `nc -C irc.example.com 6667`              |
@@ -95,7 +95,7 @@ Both `irssi` and `nc` (Netcat) can be used to interact with IRC servers, but the
 
 ### 3. Joining and Messaging
 
-```bash
+```rust
 | Task                                  | `irssi` Command                  | `nc` Raw Command                |
 |---------------------------------------|----------------------------------|---------------------------------|
 | Join a channel                        | `/join #channel`                 | `JOIN #channel`                 |
@@ -121,7 +121,7 @@ Both `irssi` and `nc` (Netcat) can be used to interact with IRC servers, but the
 ```
 ### 4. Navigation and Extras
 
-```bash
+```rust
 | Feature            | `irssi`                  | `nc`                              |
 |--------------------|--------------------------|-----------------------------------|
 | Switch windows     | `Alt + number`           | Not applicable                    |
@@ -142,15 +142,15 @@ Use `irssi` for convenience and productivity. Use `nc` when you want to debug or
 ### Quote Bot  (bonus) — Command Examples
 
 ### → "Displays a random joke from the bot’s collection.
-```bash
+```rust
 /quote bot
 ```
 ### → Adds a new joke to the collection.
-```bash
+```rust
 /quote bot set Pourquoi les canards n’aiment-ils pas les grenouilles ? Parce qu’elles les cuassent !
 ```
 ### → Removes the joke at index 1 (indexes start at 0).
-```bash
+```rust
 /quote bot remove :2
 ```
 
@@ -159,7 +159,7 @@ Use `irssi` for convenience and productivity. Use `nc` when you want to debug or
 
 As part of the bonus feature, we implemented file transfers using the `/dcc` command. This allows clients to send and receive files directly, bypassing the IRC server.
 ### Sending a File
-```bash
+```rust
 
 /dcc send <nickname> <filename>
 
@@ -169,7 +169,7 @@ As part of the bonus feature, we implemented file transfers using the `/dcc` com
 
 ### receiving a file
 
-```bash
+```rust
 /dcc get <nickname> <filename>
 
 /dcc get bob project_notes.txt
@@ -180,13 +180,13 @@ As part of the bonus feature, we implemented file transfers using the `/dcc` com
 
 ### connecting on my server from another computer
 
-```bash
-//find the ip address of the server in a terminal bash
+```rust
+//find the ip address of the server in a terminal rust
 hostname -I
 10.16.4.9  192.168.122.1  172.17.0.1 
 ```
 
-```bash
+```rust
 irssi
 /connect 10.16.4.9 <port nbr> <password>
 ```
