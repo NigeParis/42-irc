@@ -113,8 +113,8 @@ Both `irssi` and `nc` (Netcat) can be used to interact with IRC servers, but the
 | Switch windows     | `Alt + number`           | Not applicable                    |
 | View user list     | `/names`                 | `NAMES #channel`                  |
 | Help               | `/help`                  | Not available                     |
-```
 ---
+```
 
 ### Summary
 
