@@ -20,7 +20,7 @@ This project helped us become more confident with network programming and collab
 
 ### What Is the `irssi` Command?
 
-We used the `irssi` command is used to launch **Irssi**, a powerful and lightweight terminal-based IRC (Internet Relay Chat) client. It runs entirely in the terminal and is often favored for its speed, efficiency, and scriptability.
+We used the 'irssi' command a powerful and lightweight terminal-based IRC (Internet Relay Chat) client. It runs entirely in the terminal and is often favored for its speed, efficiency, and scriptability.
 
 ### What It Does
 
