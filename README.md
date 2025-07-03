@@ -17,6 +17,26 @@ We implemented file transfers between users using direct connections. It require
 This project helped us become more confident with network programming and collaboration in a real C-based project. We hit a few bumps, but we learned a lot and walked away with something we’re proud of.
 
 
+
+# What Is the `irssi` Command?
+
+We used the `irssi` command is used to launch **Irssi**, a powerful and lightweight terminal-based IRC (Internet Relay Chat) client. It runs entirely in the terminal and is often favored for its speed, efficiency, and scriptability.
+
+## What It Does
+
+When you enter `irssi` in the terminal:
+
+- It starts the Irssi interface inside your terminal window.
+- You can begin entering IRC commands like `/connect` or `/join`.
+- It allows real-time chatting in channels or via private messages.
+
+## Basic Usage Examples
+
+```bash
+irssi
+
+
+
 # Basic Irssi Commands
 
 ## Connection and Setup
@@ -71,4 +91,3 @@ This project helped us become more confident with network programming and collab
 
 - `/window close` or `/wc`  
   Close the current window
-
