@@ -117,3 +117,56 @@ USER nige nigehost localhost :Niel Robertson
 
 ```
 
+```bash
+
+# Difference in Commands Between `irssi` and `nc`
+
+Both `irssi` and `nc` (Netcat) can be used to interact with IRC servers, but they operate at very different levels of abstraction. Here's a comparison of how their commands differ:
+
+## 1. Interface Style
+
+| Tool   | Command Style           | Description                                      |
+|--------|--------------------------|--------------------------------------------------|
+| `irssi` | Slash-prefixed commands | Commands start with `/` (e.g., `/join`, `/msg`)  |
+| `nc`    | Raw IRC protocol lines  | You type raw IRC commands manually (e.g., `NICK`, `USER`) |
+
+---
+
+## 2. Connecting to a Server
+
+| Task              | `irssi` Command                          | `nc` Command Example                      |
+|-------------------|-------------------------------------------|-------------------------------------------|
+| Connect to server | `/connect irc.example.com`               | `nc -C irc.example.com 6667`              |
+| Set nickname      | `/nick myname`                           | `NICK myname` (typed manually)            |
+| Register user     | `/user myname myhost myserver :Real Name`| `USER myname myhost myserver :Real Name`  |
+
+---
+
+## 3. Joining and Messaging
+
+| Task               | `irssi` Command         | `nc` Raw Command                  |
+|--------------------|--------------------------|-----------------------------------|
+| Join a channel     | `/join #channel`         | `JOIN #channel`                   |
+| Send a message     | `/msg nick Hello`        | `PRIVMSG nick :Hello`             |
+| Leave a channel    | `/part #channel`         | `PART #channel`                   |
+| Quit IRC           | `/quit`                  | `QUIT :Goodbye`                   |
+
+---
+
+## 4. Navigation and Extras
+
+| Feature            | `irssi`                  | `nc`                              |
+|--------------------|--------------------------|-----------------------------------|
+| Switch windows     | `Alt + number`           | Not applicable                    |
+| View user list     | `/names`                 | `NAMES #channel`                  |
+| Help               | `/help`                  | Not available                     |
+
+---
+
+## Summary
+
+- **`irssi`** is a full-featured IRC client with built-in command parsing, window management, and scripting support.
+- **`nc`** is a low-level tool that sends raw text over TCP. You must manually type every IRC protocol command.
+
+Use `irssi` for convenience and productivity. Use `nc` when you want to debug or test your server at the protocol level.
+```
