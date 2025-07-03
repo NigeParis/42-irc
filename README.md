@@ -45,6 +45,8 @@ During development and testing, we used the `nc` (Netcat) command-line tool to c
 ### Example using nc Command
 
 ```bash
+// -C optiion = Send CRLF('\r\n') as line-ending.
+
 nc -C localhost 6100
 PASS <password>
 NICK <nickname>
