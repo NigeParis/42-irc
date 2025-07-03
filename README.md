@@ -96,12 +96,26 @@ Both `irssi` and `nc` (Netcat) can be used to interact with IRC servers, but the
 ### 3. Joining and Messaging
 
 ```bash
-| Task               | `irssi` Command         | `nc` Raw Command                  |
-|--------------------|--------------------------|-----------------------------------|
-| Join a channel     | `/join #channel`         | `JOIN #channel`                   |
-| Send a message     | `/msg nick Hello`        | `PRIVMSG nick :Hello`             |
-| Leave a channel    | `/part #channel`         | `PART #channel`                   |
-| Quit IRC           | `/quit`                  | `QUIT :Goodbye`                   |
+| Task                                  | `irssi` Command                  | `nc` Raw Command                |
+|---------------------------------------|----------------------------------|---------------------------------|
+| Join a channel                        | `/join #channel`                 | `JOIN #channel`                 |
+| Send a message                        | `/msg nick Hello`                | `PRIVMSG nick :Hello`           |
+| Leave a channel                       | `/part #channel`                 | `PART #channel`                 |
+| Quit IRC                              | `/quit`                          | `QUIT :Goodbye`                 |
+| Invite a user to a channel            | `/invite alice #devchat`         | `INVITE alice #devchat`         |
+| View current topic of a channel       | `/topic #project`                | `TOPIC #project`                |
+| Set a new topic (if operator)         | `/topic #project :Meeting at 5pm`| `TOPIC #project :Meeting at 5pm`|
+| Set channel to invite-only (`+i`)     | `/mode #team +i`                 | `MODE #team +i`                 |
+| Remove invite-only mode (`-i`)        | `/mode #team -i`                 | `MODE #team -i`                 |
+| Restrict topic changes to operators   | `/mode #team +t`                 | `MODE #team +t`                 |
+| Allow anyone to change topic (`-t`)   | `/mode #team -t`                 | `MODE #team -t`                 |
+| Set a channel password (`+k`)         | `/mode #vault +k secret123`      | `MODE #vault +k secret123`      |
+| Remove channel password (`-k`)        | `/mode #vault -k`                | `MODE #vault -k`                |
+| Give operator status to a user (`+o`) | `/mode #chatroom +o bob`         | `MODE #chatroom +o bob`         |
+| Remove operator status (`-o`)         | `/mode #chatroom -o bob`         | `MODE #chatroom -o bob`         |
+| Set user limit (`+l`)                 | `/mode #team +l 15`              | `MODE #team +l 15`              |
+| Remove user limit (`-l`)              | `/mode #team -l`                 | `MODE #team -l`                 |
+
 
 ---
 ```
