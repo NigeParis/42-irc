@@ -122,26 +122,28 @@ Both `irssi` and `nc` (Netcat) can be used to interact with IRC servers, but the
 Use `irssi` for convenience and productivity. Use `nc` when you want to debug or test your server at the protocol level.
 
 
-## Quote Bot — Command Examples
+## Quote Bot  (bonus) — Command Examples
 
 ```bash
 /quote bot
+```
 # → Affiche une blague aléatoire depuis la collection du bot
-
+```bash
 /quote bot set Pourquoi les canards n’aiment-ils pas les grenouilles ? Parce qu’elles les cuassent !
+```
 # → Ajoute une nouvelle blague à la collection
-
+```bash
 /quote bot remove :2
+```
 # → Supprime la blague à l’index 1 (les indices commencent à 0)
 
 
 ## File Transfer Between Clients — DCC Command Examples
 
 As part of the bonus feature, we implemented file transfers using the `/dcc` command. This allows clients to send and receive files directly, bypassing the IRC server.
-```
 ### Sending a File
-
 ```bash
+
 /dcc send <nickname> <filename>
 
 /dcc send alice project_notes.txt
