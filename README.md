@@ -1,10 +1,10 @@
-# IRC Project
+## IRC Project
 
 We teamed up to create our own IRC (Internet Relay Chat) server. The goal was to build a chat server that supports multiple users, real-time messaging, and basic features like joining channels, setting nicknames, and sending private messages—just like classic online chat systems.
 
 We used low-level socket programming to handle communication between clients and the server, and learned how to manage multiple users at the same time using threads or non-blocking I/O. Along the way, we also built in command parsing, user handling, and channel management.
 
-## Bonus Features
+### Bonus Features
 
 ### A Quote Bot
 Instead of a general-purpose bot, we created a quote bot that randomly shares preloaded quotes when prompted. It added some personality to the chat and gave us a chance to practice handling bot-triggered events and responses without blocking other server activity.
@@ -18,11 +18,11 @@ This project helped us become more confident with network programming and collab
 
 
 
-# What Is the `irssi` Command?
+### What Is the `irssi` Command?
 
 We used the `irssi` command is used to launch **Irssi**, a powerful and lightweight terminal-based IRC (Internet Relay Chat) client. It runs entirely in the terminal and is often favored for its speed, efficiency, and scriptability.
 
-## What It Does
+### What It Does
 
 When you enter `irssi` in the terminal:
 
@@ -30,7 +30,7 @@ When you enter `irssi` in the terminal:
 - You can begin entering IRC commands like `/connect` or `/join`.
 - It allows real-time chatting in channels or via private messages.
 
-## Basic Usage of irssi client command Examples
+### Basic Usage of irssi client command Examples
 
 ```bash
 irssi
@@ -38,7 +38,7 @@ irssi
 /connect localhost 6100 password
 ```
 
-## Connecting to Our IRC Server Using `nc`
+### Connecting to Our IRC Server Using `nc`
 
 During development and testing, we used the `nc` (Netcat) command-line tool to connect to our IRC server from the terminal. It provided a quick and lightweight way to manually interact with the server and send IRC commands without the need for a full client.
 
@@ -50,7 +50,7 @@ PASS <password>
 NICK nickname
 USER nige nigehost localhost :Niel Robertson
 ```
-## Breakdown of the `USER` Command Components
+### Breakdown of the `USER` Command Components
 
 ```bash
 | Part               | Description                                                                 |
@@ -64,11 +64,11 @@ USER nige nigehost localhost :Niel Robertson
 ```
 
 
-# Difference in Commands Between `irssi` and `nc`
+### Difference in Commands Between `irssi` and `nc`
 
 Both `irssi` and `nc` (Netcat) can be used to interact with IRC servers, but they operate at very different levels of abstraction. Here's a comparison of how their commands differ:
 
-## 1. Interface Style
+### 1. Interface Style
 
 ```bash
 
@@ -79,7 +79,7 @@ Both `irssi` and `nc` (Netcat) can be used to interact with IRC servers, but the
 
 ---
 ```
-## 2. Connecting to a Server
+### 2. Connecting to a Server
 
 ```bash
 | Task              | `irssi` Command                          | `nc` Command Example                      |
@@ -91,7 +91,7 @@ Both `irssi` and `nc` (Netcat) can be used to interact with IRC servers, but the
 ```
 ---
 
-## 3. Joining and Messaging
+### 3. Joining and Messaging
 
 ```bash
 | Task               | `irssi` Command         | `nc` Raw Command                  |
@@ -103,7 +103,7 @@ Both `irssi` and `nc` (Netcat) can be used to interact with IRC servers, but the
 
 ---
 ```
-## 4. Navigation and Extras
+### 4. Navigation and Extras
 
 ```bash
 | Feature            | `irssi`                  | `nc`                              |
@@ -114,7 +114,7 @@ Both `irssi` and `nc` (Netcat) can be used to interact with IRC servers, but the
 ```
 ---
 
-## Summary
+### Summary
 
 - **`irssi`** is a full-featured IRC client with built-in command parsing, window management, and scripting support.
 - **`nc`** is a low-level tool that sends raw text over TCP. You must manually type every IRC protocol command.
