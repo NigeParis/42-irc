@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Channel.cpp                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: nrobinso <nrobinso@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/03 14:31:17 by nrobinso          #+#    #+#             */
+/*   Updated: 2025/07/03 14:31:20 by nrobinso         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../include/Channel.hpp"
 
 Channel::Channel(const std::string &channel_name, const std::string &creation_time)
