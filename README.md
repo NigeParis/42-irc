@@ -140,7 +140,7 @@ Use `irssi` for convenience and productivity. Use `nc` when you want to debug or
 ```
 
 
-## File Transfer Between irssi Clients — /dcc Command Examples
+## File Transfer Between irssi Clients — /dcc Command (bonus)
 
 As part of the bonus feature, we implemented file transfers using the `/dcc` command. This allows clients to send and receive files directly, bypassing the IRC server.
 ### Sending a File
