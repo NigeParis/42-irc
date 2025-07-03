@@ -120,3 +120,16 @@ Both `irssi` and `nc` (Netcat) can be used to interact with IRC servers, but the
 - **`nc`** is a low-level tool that sends raw text over TCP. You must manually type every IRC protocol command.
 
 Use `irssi` for convenience and productivity. Use `nc` when you want to debug or test your server at the protocol level.
+
+
+## Quote Bot — Command Examples (Bash-style Format)
+
+```bash
+/quote bot
+# → Affiche une blague aléatoire depuis la collection du bot
+
+/quote bot set Pourquoi les canards n’aiment-ils pas les grenouilles ? Parce qu’elles les cuassent !
+# → Ajoute une nouvelle blague à la collection
+
+/quote bot remove :2
+# → Supprime la blague à l’index 1 (les indices commencent à 0)
