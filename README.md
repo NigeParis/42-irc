@@ -161,3 +161,15 @@ As part of the bonus feature, we implemented file transfers using the `/dcc` com
 
 
 
+### connecting on my server from another computer
+
+```bash
+//find the ip address of the server a terminal bash
+hostname -I
+10.16.4.9  192.168.122.1  172.17.0.1 
+```
+
+```bash
+irssi
+/connect 10.16.4.9 <port nbr> <password>
+```
