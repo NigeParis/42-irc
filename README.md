@@ -1,4 +1,4 @@
-# IRC Project — Team Edition @ 42
+# IRC Project
 
 We teamed up to create our own IRC (Internet Relay Chat) server. The goal was to build a chat server that supports multiple users, real-time messaging, and basic features like joining channels, setting nicknames, and sending private messages—just like classic online chat systems.
 
@@ -17,3 +17,71 @@ We implemented file transfers between users using direct connections. It require
 This project helped us become more confident with network programming and collaboration in a real C-based project. We hit a few bumps, but we learned a lot and walked away with something we’re proud of.
 
 
+# Basic Irssi Commands
+
+## Connection and Setup
+
+- `/connect <server>`  
+  Connect to an IRC server (e.g., `/connect irc.libera.chat`)
+
+- `/disconnect`  
+  Disconnect from the current server
+
+- `/server add <name> <host> <port>`  
+  Add a server to your saved list for easier access
+
+- `/nick <nickname>`  
+  Change your nickname
+
+- `/quit [message]`  
+  Leave Irssi with an optional quit message
+
+## Channel Management
+
+- `/join #channel`  
+  Join a specific channel (e.g., `/join #myproject`)
+
+- `/part [#channel] [message]`  
+  Leave a channel with an optional parting message
+
+- `/topic <new topic>`  
+  Set or change the topic of the current channel
+
+- `/names`  
+  List users currently in the channel
+
+## Messaging
+
+- `/msg <nick> <message>`  
+  Send a private message to a specific user
+
+- `/me <action>`  
+  Send an action (e.g., `/me laughs` → *yourname laughs*)
+
+- `/notice <nick> <message>`  
+  Send a notice (less intrusive than a regular message)
+
+## Navigation
+
+- `Alt + <number>`  
+  Switch to a specific Irssi window (Alt+2 = Window 2)
+
+- `Ctrl + N` / `Ctrl + P`  
+  Move to the next or previous window
+
+- `/window list`  
+  Show all open windows and their activity
+
+- `/window close` or `/wc`  
+  Close the current window
+
+## Help and Info
+
+- `/help`  
+  Display available Irssi commands
+
+- `/help <command>`  
+  Get help for a specific command (e.g., `/help join`)
+
+- `/whois <nick>`  
+  Get information about a user on the network
